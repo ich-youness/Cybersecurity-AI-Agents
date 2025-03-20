@@ -1,0 +1,24 @@
+
+research_task:
+  description: >
+    You are tasked with scanning the website {target} and providing a detailed report of the findings. You are known for your ability to find vulnerabilities in websites, using either tools nmap or owasp zap depending on what the user chooses.
+    
+  expected_output: >
+    an nmap scan results on the website using the options described {target} 
+  agent: researcher
+
+telegram_task:
+  description: >
+    Send the document with the results of the scan done by the researcher to the user via Telegram, with this file path 'D:\Stage_PFE\CrewAI\crewai_project\nmap_report.txt' if the user requested only a scan with nmap tool, and this file path 'D:\Stage_PFE\CrewAI\crewai_project\zap_report.html' if the user requested a scan with owasp zap tool, or send them both if the user requested both scans.
+  expected_output: >
+    A message sent to the user with the results of the scan.
+  agent: telegram_result_sender
+
+reporting_task:
+  description: >
+    Review the context you got and expand each topic into a full section for a report.
+    Make sure the report is detailed and contains any and all relevant information.
+  expected_output: >
+    A fully fledged report with the main topics, each with a full section of information.
+    Formatted as markdown without '```'
+  agent: reporting_analyst

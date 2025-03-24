@@ -1,17 +1,31 @@
 
 research_task:
   description: >
-    You are tasked with scanning the website {target} and providing a detailed report of the findings. You are known for your ability to find vulnerabilities in websites, using either tools nmap or owasp zap depending on what the user chooses.
+    You are tasked with ACCOMPLISHING THE FOLLOWING SCAN {target}. You are known for your ability to find vulnerabilities in websites, using either tools nmap or owasp zap depending on what the user chooses.
     
   expected_output: >
-    an nmap scan results on the website using the options described {target} 
+    a scan results on the website using the options described {target} 
   agent: researcher
 
 telegram_task:
   description: >
-    Send the document with the results of the scan done by the researcher to the user via Telegram, with this file path 'D:\Stage_PFE\CrewAI\crewai_project\nmap_report.txt' if the user requested only a scan with nmap tool, and this file path 'D:\Stage_PFE\CrewAI\crewai_project\zap_report.html' if the user requested a scan with owasp zap tool, or send them both if the user requested both scans.
+    Send the document with the results of the scan requested by the user to the user via Telegram. 
+    The agent must determine which scan(s) the user requested and send only the corresponding file(s):
+    
+    - If the user requested **only an Nmap scan**, send the file located at:
+      `D:\Stage_PFE\CrewAI\crewai_project\nmap_report.txt`.
+    
+    - If the user requested **only an OWASP ZAP scan**, send the file located at:
+      `D:\Stage_PFE\CrewAI\crewai_project\zap_report.html`.
+    
+    - If the user requested **both Nmap and OWASP ZAP scans**, send both files:
+      `D:\Stage_PFE\CrewAI\crewai_project\nmap_report.txt` and
+      `D:\Stage_PFE\CrewAI\crewai_project\zap_report.html`.
+    
+    The agent must **not send any files** for scans that were not explicitly requested by the user.
   expected_output: >
-    A message sent to the user with the results of the scan.
+    A message sent to the user via Telegram containing the results of the scan(s) they requested.
+    The message should clearly indicate which scan results are being shared.
   agent: telegram_result_sender
 
 reporting_task:

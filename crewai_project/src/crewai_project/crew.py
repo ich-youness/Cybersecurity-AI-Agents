@@ -13,18 +13,26 @@ import psycopg2
 
 DB_CONFIG = {
     "dbname": "recon_data",
-    "user": "",
+    "user": "postgres",
     "password": "bibi",
     "host": "localhost",
     "port": 5432
+    
+
 }
 
 def get_db_connection():
     """
     Establishes a connection to the PostgreSQL database.
     """
-    return psycopg2.connect(**DB_CONFIG)
-
+    try:
+        # print(DB_CONFIG)
+        conn = psycopg2.connect(**DB_CONFIG)
+        
+        return conn
+    except Exception as e:
+        print(f"Error connecting to the database: {e}")
+        raise
 os.environ['GEMINI_API_KEY'] = "AIzaSyCc_oV5dIHV_DL-5e-uC48Rym9T5kUn13k"
 
 ZAP_API_KEY= "vtfu8u1o4834lnnt8ase8opk0rq"
@@ -59,6 +67,21 @@ def owasp_zap(target: str):
     """
     OWASP ZAP scanner tool that scans a website for vulnerabilities.
     """
+    if not target.startswith("http://") and not target.startswith("https://"):
+        target = "http://" + target
+    
+
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    # Check if the result already exists in the database
+    cursor.execute("SELECT result FROM scan_results WHERE target = %s AND scan_type = %s", (target, "owasp_zap"))
+    existing_result = cursor.fetchone()
+
+    if existing_result:
+        conn.close()
+        return f"Cached result: {existing_result[0]}"
+
     zap = ZAPv2(apikey='tfu8u1o4834lnnt8ase8opk0rq', proxies={'http': 'http://127.0.0.1:8080', 'https': 'http://127.0.0.1:8080'})
 
     # Start the spider scan
@@ -84,15 +107,22 @@ def owasp_zap(target: str):
     with open(report_path, "w") as f:
         f.write(report)
 
+     # Save the result to the database
+    cursor.execute(
+        "INSERT INTO scan_results (target, scan_type, result) VALUES (%s, %s, %s)",
+        (target, "owasp_zap", report)
+    )
+    conn.commit()
+    conn.close()
     # Return the path to the report or a summary of the scan
     return f"Scan completed. Report saved to {report_path}"
 
-scraper = ScrapeWebsiteTool()
-interp_nmap = CodeInterpreterTool()
-gemini_llm = {
-      "model": "gemini/gemini-1.5-flash",
-      "api_key": "AIzaSyCc_oV5dIHV_DL-5e-uC48Rym9T5kUn13k",
-}
+# scraper = ScrapeWebsiteTool()
+# interp_nmap = CodeInterpreterTool()
+# gemini_llm = {
+#       "model": "gemini/gemini-1.5-flash",
+#       "api_key": "AIzaSyCc_oV5dIHV_DL-5e-uC48Rym9T5kUn13k",
+# }
 # @tool("telegram_result_sender")
 
 # Learn more about YAML configuration files here:
@@ -100,12 +130,28 @@ gemini_llm = {
 # Tasks: https://docs.crewai.com/concepts/tasks#yaml-configuration-recommended
 agents_config = 'config/agents.yaml'
 tasks_config = 'config/tasks.yaml'
-code_interpreter = CodeInterpreterTool()
+
 @tool("nmap scanner")
-def my_tool(target: str, options: str):
+def nmap_tool(target: str, options: str):
   """
   Nmap scanner tool that executes an Nmap scan on a given target.
   """
+  conn = get_db_connection()
+  cursor = conn.cursor()
+  
+  # Check if the result already exists in the database
+  cursor.execute("SELECT result FROM scan_results WHERE target = %s AND scan_type = %s", (target, "nmap"))
+  existing_result = cursor.fetchone()
+  
+  if existing_result:
+        print("here is the result from from the DB: ", existing_result)
+        conn.close()
+        with open("nmap_report.txt","w") as file:
+         file.write(existing_result.stdout)
+        return f"Cached result: {existing_result[0]}"
+
+
+    
   try:
     result = subprocess.run(
       ["nmap"] + options.split() + [target], 
@@ -114,11 +160,19 @@ def my_tool(target: str, options: str):
     )
     with open("nmap_report.txt","w") as file:
          file.write(result.stdout)
+    
+    # Save the result to the database
+    print("we inserted")
+    cursor.execute(
+            "INSERT INTO scan_results (target, scan_type, result) VALUES (%s, %s, %s)",
+            (target, "nmap", result.stdout)
+    )
+    conn.commit()
+    conn.close()
     return result.stdout + " =====> "+ options
   except Exception as e:
+    conn.close()
     return f"=> Error handling the Nmap command {str(e)}"
-
-
 @CrewBase
 class CrewaiProject():
     """CrewaiProject crew"""
@@ -131,7 +185,7 @@ class CrewaiProject():
     @agent
     def researcher(self) -> Agent:
         return Agent(
-            tools=[my_tool, owasp_zap],
+            tools=[nmap_tool, owasp_zap],
             config=self.agents_config['researcher'],
             verbose=True
         )

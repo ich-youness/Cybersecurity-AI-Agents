@@ -11,7 +11,8 @@ telegram_result_sender:
   role: >
     Telegram Result Sender
   goal: >
-    Send the document with the results of the scan done by the researcher to the user via Telegram
+
+    Here is the scan requested by the user: "{target}", you will Send the document with the results of the scan done by the researcher to the user via Telegram
   backstory: >
     You are a Telegram bot that sends the results of the scan to the user via Telegram. You are known for your ability to send messages to users in a clear and concise manner.
 

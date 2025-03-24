@@ -32,7 +32,7 @@ def get_db_connection():
         raise
     
 
-def my_tool(target: str, options: str):
+def nmap_tool(target: str, options: str):
   """
   Nmap scanner tool that executes an Nmap scan on a given target.
   """
@@ -46,6 +46,8 @@ def my_tool(target: str, options: str):
   if existing_result:
         print("here is the result from from the DB: ", existing_result)
         conn.close()
+        with open("nmap_report.txt","w") as file:
+         file.write(existing_result[0])
         return f"Cached result: {existing_result[0]}"
 
 
@@ -71,8 +73,8 @@ def my_tool(target: str, options: str):
   except Exception as e:
     conn.close()
     return f"=> Error handling the Nmap command {str(e)}"
-  
-my_tool("linkedin.com", "-Pn")
+
+nmap_tool("2152ad01.ich-youness.pages.dev/", "-sV")
 
 # conn = psycopg2.connect("dbname=recon_data user=postgres password=bibi host=localhost port=5432".encode('utf-8'))
 # conn = psycopg2.connect("dbname=test user=postgres")

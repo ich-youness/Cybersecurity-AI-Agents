@@ -80,6 +80,8 @@ def owasp_zap(target: str):
 
     if existing_result:
         conn.close()
+        with open("zap_report.html","w") as file:
+            file.write(existing_result[0])
         return f"Cached result: {existing_result[0]}"
 
     zap = ZAPv2(apikey='tfu8u1o4834lnnt8ase8opk0rq', proxies={'http': 'http://127.0.0.1:8080', 'https': 'http://127.0.0.1:8080'})
@@ -147,7 +149,7 @@ def nmap_tool(target: str, options: str):
         print("here is the result from from the DB: ", existing_result)
         conn.close()
         with open("nmap_report.txt","w") as file:
-         file.write(existing_result.stdout)
+         file.write(existing_result[0])
         return f"Cached result: {existing_result[0]}"
 
 

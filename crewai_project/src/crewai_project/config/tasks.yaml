@@ -1,7 +1,7 @@
 
 research_task:
   description: >
-    You are tasked with ACCOMPLISHING THE FOLLOWING SCAN {target}. You are known for your ability to find vulnerabilities in websites, using either tools nmap or owasp zap depending on what the user chooses.
+    You are tasked with ACCOMPLISHING THE FOLLOWING SCAN {target}. You are known for your ability to find vulnerabilities in websites, using either tools nmap or owasp zap or dirbuster tool or sqlmap tool depending on what the user chooses.
     
   expected_output: >
     a scan results on the website using the options described {target} 
@@ -17,10 +17,20 @@ telegram_task:
     
     - If the user requested **only an OWASP ZAP scan**, send the file located at:
       `D:\Stage_PFE\CrewAI\crewai_project\zap_report.html`.
+    - If the user requested **only an dirbuster scan**, send the file located at:
+       D:\Stage_PFE\CrewAI\crewai_project\dirbuster_report.txt
+    - If the user requested **only an sqlmap scan**, send the file located at:
+       D:\Stage_PFE\CrewAI\crewai_project\sqlmap_report.txt
+    - If the user requested **only an ssl scanner**, send the file located at:
+       D:\Stage_PFE\CrewAI\crewai_project\ssl_report.txt       
     
-    - If the user requested **both Nmap and OWASP ZAP scans**, send both files:
+    - If the user requested **Nmap and OWASP ZAP and dirbuster scans**, send both files:
       `D:\Stage_PFE\CrewAI\crewai_project\nmap_report.txt` and
-      `D:\Stage_PFE\CrewAI\crewai_project\zap_report.html`.
+      `D:\Stage_PFE\CrewAI\crewai_project\zap_report.html`and
+      'D:\Stage_PFE\CrewAI\crewai_project\dirbuster_report.txt' and
+      'D:\Stage_PFE\CrewAI\crewai_project\sqlmap_report.txt' 
+      'D:\Stage_PFE\CrewAI\crewai_project\ssl_report.txt'     
+
     
     The agent must **not send any files** for scans that were not explicitly requested by the user.
   expected_output: >

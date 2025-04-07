@@ -41,7 +41,7 @@ def owasp_zap(target: str):
         conn.close()
         return f"Cached result: {existing_result[0]}"
 
-    zap = ZAPv2(apikey='tfu8u1o4834lnnt8ase8opk0rq', proxies={'http': 'http://127.0.0.1:8080', 'https': 'http://127.0.0.1:8080'})
+    zap = ZAPv2(apikey='tfu8u1o4834lnnt8ase8opk0rq', proxies={'http': 'http://127.0.0.1:8081', 'https': 'http://127.0.0.1:8081'})
 
     # Start the spider scan
     scan_id = zap.spider.scan(target)
@@ -77,4 +77,4 @@ def owasp_zap(target: str):
     return f"Scan completed. Report saved to {report_path}"
 
 
-owasp_zap("https://2152ad01.ich-youness.pages.dev")
+owasp_zap("https://myismail.net")

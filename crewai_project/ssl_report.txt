@@ -1,0 +1,60 @@
+Version: [92m2.1.5 Windows 64-bit (Mingw)[0m
+OpenSSL 3.0.14 4 Jun 2024
+[0m
+[92mConnected to 185.199.111.153[0m
+
+Testing SSL server [92mgazijarin.com[0m on port [92m443[0m using SNI name [92mgazijarin.com[0m
+
+  [1;36mSSL/TLS Protocols:[0m
+SSLv2     [92mdisabled[0m
+SSLv3     [92mdisabled[0m
+TLSv1.0   [92mdisabled[0m
+TLSv1.1   [92mdisabled[0m
+TLSv1.2   enabled
+TLSv1.3   [92menabled[0m
+
+  [1;36mTLS Fallback SCSV:[0m
+Server [92msupports[0m TLS Fallback SCSV
+
+  [1;36mTLS renegotiation:[0m
+Session renegotiation [92mnot supported[0m
+
+  [1;36mTLS Compression:[0m
+Compression [92mdisabled[0m
+
+  [1;36mHeartbleed:[0m
+TLSv1.3 [92mnot vulnerable[0m to heartbleed
+TLSv1.2 [92mnot vulnerable[0m to heartbleed
+
+  [1;36mSupported Server Cipher(s):[0m
+[92mPreferred[0m [92mTLSv1.3[0m  [92m128[0m bits  [92mTLS_AES_128_GCM_SHA256       [0m Curve [92m25519[0m DHE 253
+Accepted  [92mTLSv1.3[0m  [92m256[0m bits  [92mTLS_AES_256_GCM_SHA384       [0m Curve [92m25519[0m DHE 253
+Accepted  [92mTLSv1.3[0m  [92m256[0m bits  [92mTLS_CHACHA20_POLY1305_SHA256 [0m Curve [92m25519[0m DHE 253
+[92mPreferred[0m TLSv1.2  [92m256[0m bits  [92mECDHE-RSA-CHACHA20-POLY1305  [0m Curve [92m25519[0m DHE 253
+Accepted  TLSv1.2  [92m128[0m bits  [92mECDHE-RSA-AES128-GCM-SHA256  [0m Curve [92m25519[0m DHE 253
+Accepted  TLSv1.2  [92m256[0m bits  [92mECDHE-RSA-AES256-GCM-SHA384  [0m Curve [92m25519[0m DHE 253
+Accepted  TLSv1.2  [92m128[0m bits  ECDHE-RSA-AES128-SHA256       Curve [92m25519[0m DHE 253
+Accepted  TLSv1.2  [92m128[0m bits  ECDHE-RSA-AES128-SHA          Curve [92m25519[0m DHE 253
+Accepted  TLSv1.2  [92m256[0m bits  ECDHE-RSA-AES256-SHA          Curve [92m25519[0m DHE 253
+Accepted  TLSv1.2  [92m128[0m bits  AES128-GCM-SHA256            
+Accepted  TLSv1.2  [92m128[0m bits  AES128-SHA                   
+Accepted  TLSv1.2  [92m256[0m bits  AES256-SHA                   
+
+  [1;36mServer Key Exchange Group(s):[0m
+TLSv1.3  [92m128[0m bits  secp256r1 (NIST P-256)[0m
+TLSv1.3  [92m192[0m bits  secp384r1 (NIST P-384)[0m
+TLSv1.3  [92m128[0m bits  [92mx25519[0m
+TLSv1.2  [92m128[0m bits  secp256r1 (NIST P-256)[0m
+TLSv1.2  [92m192[0m bits  secp384r1 (NIST P-384)[0m
+TLSv1.2  [92m128[0m bits  [92mx25519[0m
+
+  [1;36mSSL Certificate:[0m
+Signature Algorithm: [92msha256WithRSAEncryption[0m
+RSA Key Strength:    2048
+
+Subject:  gazijarin.com
+Altnames: DNS:gazijarin.com, DNS:www.gazijarin.com
+Issuer:   R10
+
+Not valid before: [92mApr  2 14:19:09 2025 GMT[0m
+Not valid after:  [92mJul  1 14:19:08 2025 GMT[0m

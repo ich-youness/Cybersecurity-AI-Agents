@@ -96,6 +96,7 @@ def main_telegram():
                     return target
             offset = updates[-1]['update_id'] + 1  # Update offset after processing
         time.sleep(1)
+
 def run():
     """
     Run the crew
@@ -115,5 +116,59 @@ def run():
     # except Exception as e:
     #     raise Exception(f"An error occurred while running the crew: {e}")
 
-if __name__ == "__main__":
-    run()
+# def train_telegram():
+#     offset = None
+#     print("Listening ... ")
+    
+#     # Send initial message asking for website and type of scan
+#     updates = get_updates(offset)
+#     if updates:
+#         chat_id = updates[-1]['message']['chat']['id']
+        
+#         send_message(chat_id, "Which website and type of scan do you want?")
+#         offset = updates[-1]['update_id'] + 1  # Update offset to avoid reprocessing old messages
+    
+#     # Wait for user's response
+#     while True:
+#         updates = get_updates(offset)
+#         if updates:
+#             last_update = updates[-1]
+#             if 'message' in last_update:
+#                 message = last_update['message']
+#                 if 'text' in message:
+#                     target = message['text']
+#                     inputs = {"target": target}
+#                     results = CrewaiProject().crew().train(n_iterations=int(sys.argv[1]), filename=sys.argv[2], inputs=inputs)
+                    
+#                     # Wait for the scan to complete
+#                     # while not results.is_complete:
+#                     #     print("Waiting for the scan to complete...")
+#                     #     time.sleep(5)
+                    
+#                     result = results.raw
+#                     # nmap_report =r"D:\Stage_PFE\CrewAI\crewai_project\nmap_report.txt"
+#                     # with open(nmap_report, "r") as f:
+#                     #     result = f.read()
+#                     # # send_message(chat_id, f"Here are your results: \n{result}")
+#                     # send_document(chat_id, nmap_report, caption="Here is your nmap scan report.")
+#                     return target
+#             offset = updates[-1]['update_id'] + 1  # Update offset after processing
+#         time.sleep(1)
+
+
+# def train():
+#     """
+#     Train the crew for a given number of iterations.
+#     """
+#     train_telegram()
+#     # inputs = {
+#     #     "topic": "AI LLMs"
+#     # }
+#     # try:
+#     #     CrewaiProject().crew().train(n_iterations=int(sys.argv[1]), filename=sys.argv[2], inputs=inputs)
+
+#     # except Exception as e:
+#     #     raise Exception(f"An error occurred while training the crew: {e}")
+
+# if __name__ == "__main__":
+#     run()

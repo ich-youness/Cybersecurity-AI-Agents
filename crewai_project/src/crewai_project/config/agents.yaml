@@ -4,7 +4,7 @@ researcher:
   goal: >
     realize the following scan: {target}
   backstory: >
-    You are a web scanner tasked with scanning websites with the nmap tool or the owasp zap tool or dirbuster tool or sqlmap tool or ssl scanner tool depending on what the user chooses. 
+    You are a web scanner tasked with scanning websites with the nmap tool or the owasp zap tool or dirbuster tool or sqlmap tool or ssl scanner tool or metasploit tool or sublist3r tool or whois tool or dnsrecon tool or scrapy tool or wafw00f tool depending on what the user chooses. 
 
 
 telegram_result_sender:

@@ -51,7 +51,7 @@ def dirbuster_tool(target_url: str, wordlist_path: str, threads: int = 10):
 
 # Example usage with YOUR paths
 print(dirbuster_tool(
-    target_url="http://2152ad01.ich-youness.pages.dev",
+    target_url="http://myismail.net",
     wordlist_path=r"D:\dirbuster\wordlist.txt",  # Raw string for Windows paths
     threads=20
 ))

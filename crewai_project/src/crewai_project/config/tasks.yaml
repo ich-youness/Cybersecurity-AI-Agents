@@ -1,7 +1,7 @@
 
 research_task:
   description: >
-    You are tasked with ACCOMPLISHING THE FOLLOWING SCAN {target}. You are known for your ability to find vulnerabilities in websites, using either tools nmap or owasp zap or dirbuster tool or sqlmap tool depending on what the user chooses.
+    You are tasked with ACCOMPLISHING THE FOLLOWING SCAN {target}. You are known for your ability to find vulnerabilities in websites, using either tools nmap or owasp zap or dirbuster tool or sqlmap tool or metasploit tool or sublist3r tool or whois tool depending on what the user chooses.
     
   expected_output: >
     a scan results on the website using the options described {target} 
@@ -23,13 +23,28 @@ telegram_task:
        D:\Stage_PFE\CrewAI\crewai_project\sqlmap_report.txt
     - If the user requested **only an ssl scanner**, send the file located at:
        D:\Stage_PFE\CrewAI\crewai_project\ssl_report.txt       
+    - If the user requested **only an Sublist3r**, send the file located at:
+       D:\Stage_PFE\CrewAI\crewai_project\Sublist3r_report.txt 
+    - If the user requested **only an whois tool**, send the file located at:
+       D:\Stage_PFE\CrewAI\crewai_project\whois_report.txt 
+    - If the user requested **only an dnsrecon tool**, send the file located at:
+       D:\Stage_PFE\CrewAI\crewai_project\dnsrecon_report.txt 
+    - If the user requested **only an scrapy tool**, send the file located at:
+       D:\Stage_PFE\CrewAI\crewai_project\scrapy_report.json 
+    - If the user requested **only an wafw00f tool**, send the file located at:
+       D:\Stage_PFE\CrewAI\crewai_project\wafw00f_report.txt 
     
-    - If the user requested **Nmap and OWASP ZAP and dirbuster scans**, send both files:
+    - If the user requested OTHER COMBINATIONS, send THE files RELEVANT TO WHAT THE USER REQUESTED:
       `D:\Stage_PFE\CrewAI\crewai_project\nmap_report.txt` and
       `D:\Stage_PFE\CrewAI\crewai_project\zap_report.html`and
       'D:\Stage_PFE\CrewAI\crewai_project\dirbuster_report.txt' and
       'D:\Stage_PFE\CrewAI\crewai_project\sqlmap_report.txt' 
-      'D:\Stage_PFE\CrewAI\crewai_project\ssl_report.txt'     
+      'D:\Stage_PFE\CrewAI\crewai_project\ssl_report.txt'   
+      'D:\Stage_PFE\CrewAI\crewai_project\Sublist3r_report.txt' 
+      'D:\Stage_PFE\CrewAI\crewai_project\whois_report.txt '
+      'D:\Stage_PFE\CrewAI\crewai_project\dnsrecon_report.txt '
+      'D:\Stage_PFE\CrewAI\crewai_project\scrapy_report.json '
+      'D:\Stage_PFE\CrewAI\crewai_project\wafw00f_report.txt'
 
     
     The agent must **not send any files** for scans that were not explicitly requested by the user.

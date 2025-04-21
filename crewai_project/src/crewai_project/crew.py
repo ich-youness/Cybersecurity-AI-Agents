@@ -10,6 +10,8 @@ import requests
 import time
 from zapv2 import ZAPv2
 import psycopg2
+from pymetasploit3.msfrpc import MsfRpcClient
+import whois
 
 agents_config = 'config/agents.yaml'
 tasks_config = 'config/tasks.yaml'
@@ -64,7 +66,63 @@ def send_telegram_document( file_path: str):
     except Exception as e:
         return f"Error sending document: {str(e)}"
     
+@tool("scrapy tool")
+def scrapy_tool(target_url: str):
+    """
+    Scrapy tool to scrape a website and extract information using a Scrapy spider.
+    The spider must accept 'target_url' as an argument.
+    """
+    conn = get_db_connection()
+    cursor = conn.cursor()
 
+    # Check if the result already exists in the database
+    cursor.execute("SELECT result FROM scan_results WHERE target = %s AND scan_type = %s", (target_url, "scrapy"))
+    existing_result = cursor.fetchone()
+
+    if existing_result:
+        with open("scrapy_report.json", "w") as file:
+            file.write(existing_result[0])
+        conn.close()
+        return f"Cached Scrapy results loaded correctly!"
+    
+    try:
+        # Run the Scrapy spider
+        subprocess.run(
+            [
+                "scrapy",
+                "runspider",
+                r"D:\Stage_PFE\CrewAI\crewai_project\src\crewai_project\scrapy_test.py",
+                "-a", f"target_url={target_url}",
+                "-o", "scrapy_report.json"
+            ],
+            capture_output=True,
+            text=True
+        )
+
+        # Read the output from the generated JSON file
+        with open("scrapy_report.json", "r") as file:
+            result = file.read()
+
+        print("Cache from file ::> ", result)
+
+        if result:
+            # Insert the result into the database
+            cursor.execute(
+                "INSERT INTO scan_results (target, scan_type, result) VALUES (%s, %s, %s)",
+                (target_url, "scrapy", result)
+            )
+            conn.commit()
+            conn.close()
+            return "Scraping completed. Output saved to scrapy_report.json and inserted into the database."
+        else:
+            conn.commit()
+            conn.close()
+            return "Scrapy failed: No output generated."
+
+    except Exception as e:
+        conn.rollback()
+        conn.close()
+        return f"Unexpected error: {str(e)}"
 @tool("owasp zap vulnerability scanner")
 def owasp_zap(target: str):
     """
@@ -99,13 +157,13 @@ def owasp_zap(target: str):
         time.sleep(5)
 
     # Start the active scan
-    print("Starting active scan...")
-    ascan_id = zap.ascan.scan(target)
+    # print("Starting active scan...")
+    # ascan_id = zap.ascan.scan(target)
 
     # Wait for the active scan to complete
-    while int(zap.ascan.status(ascan_id)) < 100:
-        print(f"Active scan progress: {zap.ascan.status(ascan_id)}%")
-        time.sleep(5)
+    # while int(zap.ascan.status(ascan_id)) < 100:
+    #     print(f"Active scan progress: {zap.ascan.status(ascan_id)}%")
+    #     time.sleep(5)
 
     # Generate a report
     report = zap.core.htmlreport()
@@ -169,7 +227,7 @@ def dirbuster_tool(target_url: str, options: str):
             "-u", target_url,
             "-l", r"D:\dirbuster\wordlist.txt",
             "-t", str(10),
-            "-noGUI", # Force CLI mode (no GUI popup)
+            # "-noGUI", # Force CLI mode (no GUI popup)
             "-H",
             "-o", "dirbuster_report.txt",
             "-v", "True"
@@ -206,7 +264,6 @@ def dirbuster_tool(target_url: str, options: str):
         return "Error: Java or DirBuster.jar not found. Check paths."
     except Exception as e:
         return f"Unexpected error: {str(e)}"
-
 
 @tool("sqlmap scanner")
 def sqlmap_tool(target_url: str, options: str):
@@ -320,7 +377,268 @@ def ssl_scanner(target_url: str):
     except Exception as e:
         return f"Unexpected error: {str(e)}"
     
+@tool("sublist3r subdomain enumeration")
+#capable of bruteforcing as well with -b, try adding it later!
+def sublist3r_tool(target_domain: str):
+    """
+    Sublist3r tool for subdomain enumeration.
 
+    Args:
+        target_domain (str): The target domain to enumerate subdomains for.
+
+    Returns:
+        str: The result of the Sublist3r scan.
+    """
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    # Check if the result already exists in the database
+    cursor.execute("SELECT result FROM scan_results WHERE target = %s AND scan_type = %s", (target_domain, "sublist3r"))
+    existing_result = cursor.fetchone()
+
+    if existing_result:
+        print("Here is the result from the DB: ", existing_result)
+        conn.close()
+        with open("sublist3r_report.txt", "w") as file:
+            file.write(existing_result[0])
+        return f"Cached result: {existing_result[0]}"
+
+    try:
+        # Construct the Sublist3r command
+        command = ["sublist3r", "-d", target_domain]
+
+        # Run the command
+        result = subprocess.run(
+            command,
+            capture_output=True,
+            text=True,
+            check=True
+        )
+
+        # Save output to a file
+        with open("sublist3r_report.txt", "w") as file:
+            file.write(result.stdout)
+
+        # Save the result to the database
+        print("Inserting result into the database...")
+        cursor.execute(
+            "INSERT INTO scan_results (target, scan_type, result) VALUES (%s, %s, %s)",
+            (target_domain, "sublist3r", result.stdout)
+        )
+        conn.commit()
+        conn.close()
+
+        return "Sublist3r scan completed. Results saved to sublist3r_report.txt"
+
+    except subprocess.CalledProcessError as e:
+        return f"Sublist3r failed (exit code {e.returncode}): {e.stderr}"
+    except FileNotFoundError:
+        return "Error: Sublist3r not found. Ensure it is installed and in your PATH."
+    except Exception as e:
+        return f"Unexpected error: {str(e)}"
+    
+@tool("whois lookup")
+def whois_tool(target_domain: str):
+    """
+    WHOIS lookup tool to retrieve domain registration information.
+
+    Args:
+        target_domain (str): The target domain to perform a WHOIS lookup on.
+
+    Returns:
+        str: The WHOIS information for the target domain.
+    """
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    # Check if the result already exists in the database
+    cursor.execute("SELECT result FROM scan_results WHERE target = %s AND scan_type = %s", (target_domain, "whois"))
+    existing_result = cursor.fetchone()
+
+    if existing_result:
+        print("Here is the result from the DB: ", existing_result)
+        conn.close()
+        with open("whois_report.txt", "w") as file:
+            file.write(existing_result[0])
+        return f"Cached result: {existing_result[0]}"
+
+    try:
+        # Perform the WHOIS lookup
+        print(f"Performing WHOIS lookup for {target_domain}...")
+        whois_data = whois.whois(target_domain)
+
+        # Save the WHOIS data to a file
+        with open("whois_report.txt", "w") as file:
+            file.write(str(whois_data))
+
+        # Save the result to the database
+        print("Inserting result into the database...")
+        cursor.execute(
+            "INSERT INTO scan_results (target, scan_type, result) VALUES (%s, %s, %s)",
+            (target_domain, "whois", str(whois_data))
+        )
+        conn.commit()
+        conn.close()
+
+        return f"WHOIS lookup completed. Results saved to whois_report.txt\n\n{whois_data}"
+
+    except Exception as e:
+        return f"Error performing WHOIS lookup: {str(e)}"
+
+@tool("dnsrecon scanner")
+def dnsrecon_tool(target_domain: str, options: str = ""):
+    """
+    DNSRecon tool for DNS enumeration.
+
+    Args:
+        target_domain (str): The target domain to enumerate DNS records for.
+        options (str): Additional DNSRecon options (e.g., "-t brt").
+
+    Returns:
+        str: The result of the DNSRecon scan.
+    """
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    # Check if the result already exists in the database
+    cursor.execute("SELECT result FROM scan_results WHERE target = %s AND scan_type = %s AND dnsrecon_parameters = %s", 
+                   (target_domain, "dnsrecon", options))
+    existing_result = cursor.fetchone()
+
+    if existing_result:
+        print("Here is the result from the DB: ", existing_result)
+        conn.close()
+        with open("dnsrecon_report.txt", "w") as file:
+            file.write(existing_result[0])
+        return f"Cached result: {existing_result[0]}"
+
+    try:
+        # Construct the DNSRecon command
+        command = ["dnsrecon", "-d", target_domain] + options.split()
+
+        # Run the command
+        result = subprocess.run(
+            command,
+            capture_output=True,
+            text=True,
+            check=True
+        )
+
+        # Save output to a file
+        with open("dnsrecon_report.txt", "w") as file:
+            file.write(result.stdout)
+
+        # Save the result to the database
+        print("Inserting result into the database...")
+        cursor.execute(
+            "INSERT INTO scan_results (target, scan_type, result, dnsrecon_parameters) VALUES (%s, %s, %s, %s)",
+            (target_domain, "dnsrecon", result.stdout, options)
+        )
+        conn.commit()
+        conn.close()
+
+        return "DNSRecon scan completed. Results saved to dnsrecon_report.txt"
+
+    except subprocess.CalledProcessError as e:
+        return f"DNSRecon failed (exit code {e.returncode}): {e.stderr}"
+    except FileNotFoundError:
+        return "Error: DNSRecon not found. Ensure it is installed and in your PATH."
+    except Exception as e:
+        return f"Unexpected error: {str(e)}"
+    
+
+@tool("metasploit exploitation tool")
+def metasploit_tool(target_ip: str, exploit: str, payload: str, options: dict):
+    """
+    Metasploit exploitation tool to exploit a target using a specified exploit and payload.
+
+    Args:
+        target_ip (str): The target IP address.
+        exploit (str): The Metasploit exploit module to use (e.g., "exploit/windows/smb/ms17_010_eternalblue").
+        payload (str): The Metasploit payload to use (e.g., "windows/meterpreter/reverse_tcp").
+        options (dict): Additional options for the exploit (e.g., LHOST, LPORT).
+
+    Returns:
+        str: The result of the exploitation attempt.
+    """
+    try:
+        # Connect to Metasploit RPC server
+        client = MsfRpcClient(password='msfpassword', username='yns', port=55559, server='127.0.0.1', ssl=False)
+
+
+        # Use the specified exploit
+        exploit_module = client.modules.use('exploit', exploit)
+        exploit_module['RHOSTS'] = target_ip
+
+        # Set the payload
+        payload_module = client.modules.use('payload', payload)
+        for key, value in options.items():
+            payload_module[key] = value
+
+        # Execute the exploit
+        print(f"Running exploit {exploit} against {target_ip}...")
+        job_id = exploit_module.execute(payload=payload_module)
+
+        # Wait for the exploit to complete
+        while client.jobs.list:
+            print("Exploit running...")
+            time.sleep(5)
+
+        # Check for sessions
+        if client.sessions.list:
+            session_id = list(client.sessions.list.keys())[0]
+            session = client.sessions.session(session_id)
+            return f"Exploit successful! Session ID: {session_id}\nSession Info: {session.info}"
+            return f"Exploit successful! Session ID: {session_id}"
+
+        else:
+            return "Exploit failed. No session created."
+
+    except Exception as e:
+        return f"Error running Metasploit tool: {str(e)}"
+  
+@tool("wafw00f tool")
+def wafw00f_tool(target:str):
+    """
+    wafw00f is a web app firewall detection tool
+    """
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    cursor.execute("SELECT result FROM scan_results WHERE target = %s AND scan_type = %s", (target, "wafw00f"))
+    existing_result = cursor.fetchone()
+    if existing_result:
+        print("Here is the result from the DB: ", existing_result)
+        conn.close()
+        with open("wafw00f_report.txt", "w") as file:
+            file.write(existing_result[0])
+        return f"Cached result: {existing_result[0]}"
+    try:
+        # Run wafw00f command
+        result = subprocess.run(
+            ["wafw00f", target],
+            capture_output=True,
+            text=True,
+            check=True
+        )
+
+        # Save output to a file
+        with open("wafw00f_report.txt", "w") as file:
+            file.write(result.stdout)
+
+        # Save the result to the database
+        print("Inserting result into the database...")
+        cursor.execute(
+            "INSERT INTO scan_results (target, scan_type, result) VALUES (%s, %s, %s)",
+            (target, "wafw00f", result.stdout)
+        )
+        conn.commit()
+        conn.close()
+
+        return "WAFW00F scan completed. Results saved to wafw00f_report.txt"
+    
+    except Exception as e:
+        return f"Unexpected error: {str(e)}"
 @tool("nmap scanner")
 def nmap_tool(target: str, options: str):
   """
@@ -379,7 +697,7 @@ class CrewaiProject():
     @agent
     def researcher(self) -> Agent:
         return Agent(
-            tools=[nmap_tool, owasp_zap, dirbuster_tool, sqlmap_tool, ssl_scanner],
+            tools=[nmap_tool, owasp_zap, dirbuster_tool, sqlmap_tool, ssl_scanner,metasploit_tool, sublist3r_tool, whois_tool, dnsrecon_tool, scrapy_tool,wafw00f_tool],
             config=self.agents_config['researcher'],
             verbose=True
         )

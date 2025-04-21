@@ -1,0 +1,10 @@
+{
+  "domain_name": null,
+  "registrar": null,
+  "creation_date": null,
+  "expiration_date": null,
+  "name_servers": null,
+  "status": null,
+  "emails": null,
+  "updated_date": null
+}

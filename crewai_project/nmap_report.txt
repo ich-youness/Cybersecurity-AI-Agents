@@ -1,48 +1,250 @@
-Starting Nmap 7.95 ( https://nmap.org ) at 2025-04-07 00:55 Morocco Daylight Time
-Nmap scan report for exelib.net (66.96.149.30)
-Host is up (0.18s latency).
-Not shown: 988 filtered tcp ports (no-response)
-PORT     STATE  SERVICE      VERSION
-20/tcp   closed ftp-data
-21/tcp   closed ftp
-25/tcp   closed smtp
-80/tcp   open   http         nginx
-|_http-server-header: Apache
-|_http-title: Did not follow redirect to http://www.exelib.net/
-110/tcp  closed pop3
-143/tcp  closed imap
-443/tcp  open   ssl/http     nginx
-|_http-server-header: Apache
-| ssl-cert: Subject: commonName=www.exelib.net
-| Subject Alternative Name: DNS:www.exelib.net, DNS:exelib.net
-| Not valid before: 2023-06-05T00:00:00
-|_Not valid after:  2024-06-04T23:59:59
+Starting Nmap 7.95 ( https://nmap.org ) at 2025-04-21 13:56 Morocco Daylight Time
+Nmap scan report for dr-keller-pierre.chirurgiens-dentistes.fr (162.55.54.135)
+Host is up (0.059s latency).
+rDNS record for 162.55.54.135: vps14.mediweb.co
+Not shown: 838 closed tcp ports (reset), 136 filtered tcp ports (no-response), 10 filtered tcp ports (admin-prohibited)
+PORT      STATE SERVICE               VERSION
+21/tcp    open  ftp                   ProFTPD or KnFTPD
 |_ssl-date: TLS randomness does not represent time
-|_http-title: Did not follow redirect to http://www.exelib.net/
-465/tcp  closed smtps
-587/tcp  closed submission
-993/tcp  closed imaps
-995/tcp  closed pop3s
-2222/tcp closed EtherNetIP-1
-OS fingerprint not ideal because: Host distance (13 network hops) is greater than five
-No OS matches for host
-Network Distance: 13 hops
+| tls-alpn: 
+|_  ftp
+| tls-nextprotoneg: 
+|_  ftp
+| ssl-cert: Subject: commonName=vps14.mediweb.co
+| Subject Alternative Name: DNS:vps14.mediweb.co
+| Not valid before: 2023-12-03T11:44:38
+|_Not valid after:  2024-03-02T11:44:37
+22/tcp    open  ssh                   OpenSSH 8.0 (protocol 2.0)
+| ssh-hostkey: 
+|   3072 04:b9:74:87:e5:b7:f8:f7:d8:1c:cb:82:a8:0d:0f:16 (RSA)
+|   256 21:38:1c:f9:3d:67:9b:6c:f7:c3:11:55:de:75:8f:5d (ECDSA)
+|_  256 fe:d2:86:ee:dc:e7:fd:0b:55:a9:54:a6:b1:20:cb:77 (ED25519)
+25/tcp    open  smtp                  Postfix smtpd
+| ssl-cert: Subject: commonName=vps14.mediweb.co/organizationName=SomeOrganization/stateOrProvinceName=SomeState/countryName=--
+| Not valid before: 2021-04-12T11:44:20
+|_Not valid after:  2022-04-12T11:44:20
+|_smtp-commands: vps14.mediweb.co, PIPELINING, SIZE 10240000, VRFY, ETRN, STARTTLS, AUTH PLAIN LOGIN, AUTH=PLAIN LOGIN, ENHANCEDSTATUSCODES, 8BITMIME, DSN, SMTPUTF8
+|_ssl-date: TLS randomness does not represent time
+53/tcp    open  domain                ISC BIND 9.11.36 (RedHat Enterprise Linux 8)
+| dns-nsid: 
+|_  bind.version: 9.11.36-RedHat-9.11.36-14.el8_10
+80/tcp    open  http                  Apache httpd
+|_http-server-header: Apache
+|_http-title: Did not follow redirect to https://dr-keller-pierre.chirurgiens-dentistes.fr/
+110/tcp   open  pop3                  Dovecot pop3d
+| ssl-cert: Subject: commonName=dr-keller-pierre.chirurgiens-dentistes.fr
+| Subject Alternative Name: DNS:dr-keller-pierre.chirurgiens-dentistes.fr, DNS:www.dr-keller-pierre.chirurgiens-dentistes.fr
+| Not valid before: 2025-04-15T06:31:15
+|_Not valid after:  2025-07-14T06:31:14
+|_ssl-date: TLS randomness does not represent time
+|_pop3-capabilities: STLS RESP-CODES USER UIDL AUTH-RESP-CODE SASL PIPELINING CAPA TOP
+143/tcp   open  imap                  Dovecot imapd
+| ssl-cert: Subject: commonName=dr-keller-pierre.chirurgiens-dentistes.fr
+| Subject Alternative Name: DNS:dr-keller-pierre.chirurgiens-dentistes.fr, DNS:www.dr-keller-pierre.chirurgiens-dentistes.fr
+| Not valid before: 2025-04-15T06:31:15
+|_Not valid after:  2025-07-14T06:31:14
+|_ssl-date: TLS randomness does not represent time
+|_imap-capabilities: IDLE IMAP4rev1 ID SASL-IR more ENABLE post-login listed capabilities STARTTLS LITERAL+ have OK LOGIN-REFERRALS LOGINDISABLEDA0001 Pre-login
+443/tcp   open  ssl/http              Apache httpd
+|_ssl-date: TLS randomness does not represent time
+| ssl-cert: Subject: commonName=dr-keller-pierre.chirurgiens-dentistes.fr
+| Subject Alternative Name: DNS:dr-keller-pierre.chirurgiens-dentistes.fr, DNS:www.dr-keller-pierre.chirurgiens-dentistes.fr
+| Not valid before: 2025-04-15T06:31:15
+|_Not valid after:  2025-07-14T06:31:14
+|_http-server-header: Apache
+|_http-title: Dr Pierre KELLER | Chirurgien-dentiste \xC3\xA0 Strasbourg (67000)
+465/tcp   open  ssl/smtp              Postfix smtpd
+|_ssl-date: TLS randomness does not represent time
+| ssl-cert: Subject: commonName=vps14.mediweb.co/organizationName=SomeOrganization/stateOrProvinceName=SomeState/countryName=--
+| Not valid before: 2021-04-12T11:44:20
+|_Not valid after:  2022-04-12T11:44:20
+|_smtp-commands: vps14.mediweb.co, PIPELINING, SIZE 10240000, VRFY, ETRN, AUTH PLAIN LOGIN, AUTH=PLAIN LOGIN, ENHANCEDSTATUSCODES, 8BITMIME, DSN, SMTPUTF8
+587/tcp   open  smtp                  Postfix smtpd
+|_smtp-commands: vps14.mediweb.co, PIPELINING, SIZE 10240000, VRFY, ETRN, STARTTLS, AUTH PLAIN LOGIN, AUTH=PLAIN LOGIN, ENHANCEDSTATUSCODES, 8BITMIME, DSN, SMTPUTF8
+|_ssl-date: TLS randomness does not represent time
+| ssl-cert: Subject: commonName=vps14.mediweb.co/organizationName=SomeOrganization/stateOrProvinceName=SomeState/countryName=--
+| Not valid before: 2021-04-12T11:44:20
+|_Not valid after:  2022-04-12T11:44:20
+993/tcp   open  ssl/imap              Dovecot imapd
+|_ssl-date: TLS randomness does not represent time
+|_imap-capabilities: IDLE IMAP4rev1 ID SASL-IR more Pre-login post-login listed LOGIN-REFERRALS AUTH=LOGINA0001 LITERAL+ have OK ENABLE capabilities AUTH=PLAIN
+| ssl-cert: Subject: commonName=dr-keller-pierre.chirurgiens-dentistes.fr
+| Subject Alternative Name: DNS:dr-keller-pierre.chirurgiens-dentistes.fr, DNS:www.dr-keller-pierre.chirurgiens-dentistes.fr
+| Not valid before: 2025-04-15T06:31:15
+|_Not valid after:  2025-07-14T06:31:14
+995/tcp   open  ssl/pop3              Dovecot pop3d
+|_ssl-date: TLS randomness does not represent time
+|_pop3-capabilities: SASL(PLAIN LOGIN) USER PIPELINING AUTH-RESP-CODE CAPA RESP-CODES TOP UIDL
+| ssl-cert: Subject: commonName=dr-keller-pierre.chirurgiens-dentistes.fr
+| Subject Alternative Name: DNS:dr-keller-pierre.chirurgiens-dentistes.fr, DNS:www.dr-keller-pierre.chirurgiens-dentistes.fr
+| Not valid before: 2025-04-15T06:31:15
+|_Not valid after:  2025-07-14T06:31:14
+2222/tcp  open  ssh                   ProFTPD mod_sftp (protocol 2.0)
+3306/tcp  open  mysql                 MariaDB 10.3.23 or earlier (unauthorized)
+10000/tcp open  ssl/snet-sensor-mgmt?
+| fingerprint-strings: 
+|   GetRequest: 
+|     HTTP/1.0 200 Document follows
+|     Date: Mon, 21 Apr 2025 12:57:04 GMT
+|     Server: MiniServ
+|     Connection: close
+|     Auth-type: auth-required=1
+|     Set-Cookie: redirect=1; path=/; secure; httpOnly
+|     Set-Cookie: testing=1; path=/; secure; httpOnly
+|     X-Frame-Options: SAMEORIGIN
+|     Content-Security-Policy: script-src 'self' 'unsafe-inline' 'unsafe-eval'; frame-src 'self'; child-src 'self'
+|     X-Content-Type-Options: nosniff
+|     X-no-links: 1
+|     Content-type: text/html; Charset=UTF-8
+|     <!DOCTYPE HTML>
+|     <html data-bgs="gainsboro" class="session_login">
+|     <head>
+|     <meta name="color-scheme" content="only light">
+|     <noscript> <style> html[data-bgs="gainsboro"] { background-color: #d6d6d6; } html[data-bgs="nightRider"] { background-color: #1a1c20; } html[data-bgs="nightRider"] div[data-noscript] { color: #979ba080; } html[data-slider-fixed='1'] { margin-right: 0 !important; } body > div[data-noscript] ~ * { display: none !impo
+|   HTTPOptions: 
+|     HTTP/1.0 200 Document follows
+|     Date: Mon, 21 Apr 2025 12:57:05 GMT
+|     Server: MiniServ
+|     Connection: close
+|     Auth-type: auth-required=1
+|     Set-Cookie: redirect=1; path=/; secure; httpOnly
+|     Set-Cookie: testing=1; path=/; secure; httpOnly
+|     X-Frame-Options: SAMEORIGIN
+|     Content-Security-Policy: script-src 'self' 'unsafe-inline' 'unsafe-eval'; frame-src 'self'; child-src 'self'
+|     X-Content-Type-Options: nosniff
+|     X-no-links: 1
+|     Content-type: text/html; Charset=UTF-8
+|     <!DOCTYPE HTML>
+|     <html data-bgs="gainsboro" class="session_login">
+|     <head>
+|     <meta name="color-scheme" content="only light">
+|_    <noscript> <style> html[data-bgs="gainsboro"] { background-color: #d6d6d6; } html[data-bgs="nightRider"] { background-color: #1a1c20; } html[data-bgs="nightRider"] div[data-noscript] { color: #979ba080; } html[data-slider-fixed='1'] { margin-right: 0 !important; } body > div[data-noscript] ~ * { display: none !impo
+|_ssl-date: TLS randomness does not represent time
+| ssl-cert: Subject: commonName=dr-keller-pierre.chirurgiens-dentistes.fr
+| Subject Alternative Name: DNS:dr-keller-pierre.chirurgiens-dentistes.fr, DNS:www.dr-keller-pierre.chirurgiens-dentistes.fr
+| Not valid before: 2025-04-15T06:31:15
+|_Not valid after:  2025-07-14T06:31:14
+20000/tcp open  ssl/dnp?
+| fingerprint-strings: 
+|   GetRequest, HTTPOptions: 
+|     HTTP/1.0 200 Document follows
+|     Date: Mon, 21 Apr 2025 12:57:05 GMT
+|     Server: MiniServ
+|     Connection: close
+|     Auth-type: auth-required=1
+|     Set-Cookie: redirect=1; path=/; secure; httpOnly
+|     Set-Cookie: testing=1; path=/; secure; httpOnly
+|     X-Frame-Options: SAMEORIGIN
+|     Content-Security-Policy: script-src 'self' 'unsafe-inline' 'unsafe-eval'; frame-src 'self'; child-src 'self'
+|     X-Content-Type-Options: nosniff
+|     X-no-links: 1
+|     Content-type: text/html; Charset=UTF-8
+|     <!DOCTYPE HTML>
+|     <html data-bgs="gainsboro" class="session_login">
+|     <head>
+|     <meta name="color-scheme" content="only light">
+|_    <noscript> <style> html[data-bgs="gainsboro"] { background-color: #d6d6d6; } html[data-bgs="nightRider"] { background-color: #1a1c20; } html[data-bgs="nightRider"] div[data-noscript] { color: #979ba080; } html[data-slider-fixed='1'] { margin-right: 0 !important; } body > div[data-noscript] ~ * { display: none !impo
+|_ssl-date: TLS randomness does not represent time
+| ssl-cert: Subject: commonName=dr-keller-pierre.chirurgiens-dentistes.fr
+| Subject Alternative Name: DNS:dr-keller-pierre.chirurgiens-dentistes.fr, DNS:www.dr-keller-pierre.chirurgiens-dentistes.fr
+| Not valid before: 2025-04-15T06:31:15
+|_Not valid after:  2025-07-14T06:31:14
+2 services unrecognized despite returning data. If you know the service/version, please submit the following fingerprints at https://nmap.org/cgi-bin/submit.cgi?new-service :
+==============NEXT SERVICE FINGERPRINT (SUBMIT INDIVIDUALLY)==============
+SF-Port10000-TCP:V=7.95%T=SSL%I=7%D=4/21%Time=680640A1%P=i686-pc-windows-w
+SF:indows%r(GetRequest,15EC,"HTTP/1\.0\x20200\x20Document\x20follows\r\nDa
+SF:te:\x20Mon,\x2021\x20Apr\x202025\x2012:57:04\x20GMT\r\nServer:\x20MiniS
+SF:erv\r\nConnection:\x20close\r\nAuth-type:\x20auth-required=1\r\nSet-Coo
+SF:kie:\x20redirect=1;\x20path=/;\x20secure;\x20httpOnly\r\nSet-Cookie:\x2
+SF:0testing=1;\x20path=/;\x20secure;\x20httpOnly\r\nX-Frame-Options:\x20SA
+SF:MEORIGIN\r\nContent-Security-Policy:\x20script-src\x20'self'\x20'unsafe
+SF:-inline'\x20'unsafe-eval';\x20frame-src\x20'self';\x20child-src\x20'sel
+SF:f'\r\nX-Content-Type-Options:\x20nosniff\r\nX-no-links:\x201\r\nContent
+SF:-type:\x20text/html;\x20Charset=UTF-8\r\n\r\n<!DOCTYPE\x20HTML>\n<html\
+SF:x20data-bgs=\"gainsboro\"\x20class=\"session_login\">\n<head>\n\x20<met
+SF:a\x20name=\"color-scheme\"\x20content=\"only\x20light\">\n\x20<noscript
+SF:>\x20<style>\x20html\[data-bgs=\"gainsboro\"\]\x20{\x20background-color
+SF::\x20#d6d6d6;\x20}\x20html\[data-bgs=\"nightRider\"\]\x20{\x20backgroun
+SF:d-color:\x20#1a1c20;\x20}\x20html\[data-bgs=\"nightRider\"\]\x20div\[da
+SF:ta-noscript\]\x20{\x20color:\x20#979ba080;\x20}\x20html\[data-slider-fi
+SF:xed='1'\]\x20{\x20margin-right:\x200\x20!important;\x20}\x20body\x20>\x
+SF:20div\[data-noscript\]\x20~\x20\*\x20{\x20display:\x20none\x20!impo")%r
+SF:(HTTPOptions,15EC,"HTTP/1\.0\x20200\x20Document\x20follows\r\nDate:\x20
+SF:Mon,\x2021\x20Apr\x202025\x2012:57:05\x20GMT\r\nServer:\x20MiniServ\r\n
+SF:Connection:\x20close\r\nAuth-type:\x20auth-required=1\r\nSet-Cookie:\x2
+SF:0redirect=1;\x20path=/;\x20secure;\x20httpOnly\r\nSet-Cookie:\x20testin
+SF:g=1;\x20path=/;\x20secure;\x20httpOnly\r\nX-Frame-Options:\x20SAMEORIGI
+SF:N\r\nContent-Security-Policy:\x20script-src\x20'self'\x20'unsafe-inline
+SF:'\x20'unsafe-eval';\x20frame-src\x20'self';\x20child-src\x20'self'\r\nX
+SF:-Content-Type-Options:\x20nosniff\r\nX-no-links:\x201\r\nContent-type:\
+SF:x20text/html;\x20Charset=UTF-8\r\n\r\n<!DOCTYPE\x20HTML>\n<html\x20data
+SF:-bgs=\"gainsboro\"\x20class=\"session_login\">\n<head>\n\x20<meta\x20na
+SF:me=\"color-scheme\"\x20content=\"only\x20light\">\n\x20<noscript>\x20<s
+SF:tyle>\x20html\[data-bgs=\"gainsboro\"\]\x20{\x20background-color:\x20#d
+SF:6d6d6;\x20}\x20html\[data-bgs=\"nightRider\"\]\x20{\x20background-color
+SF::\x20#1a1c20;\x20}\x20html\[data-bgs=\"nightRider\"\]\x20div\[data-nosc
+SF:ript\]\x20{\x20color:\x20#979ba080;\x20}\x20html\[data-slider-fixed='1'
+SF:\]\x20{\x20margin-right:\x200\x20!important;\x20}\x20body\x20>\x20div\[
+SF:data-noscript\]\x20~\x20\*\x20{\x20display:\x20none\x20!impo");
+==============NEXT SERVICE FINGERPRINT (SUBMIT INDIVIDUALLY)==============
+SF-Port20000-TCP:V=7.95%T=SSL%I=7%D=4/21%Time=680640A1%P=i686-pc-windows-w
+SF:indows%r(GetRequest,15BC,"HTTP/1\.0\x20200\x20Document\x20follows\r\nDa
+SF:te:\x20Mon,\x2021\x20Apr\x202025\x2012:57:05\x20GMT\r\nServer:\x20MiniS
+SF:erv\r\nConnection:\x20close\r\nAuth-type:\x20auth-required=1\r\nSet-Coo
+SF:kie:\x20redirect=1;\x20path=/;\x20secure;\x20httpOnly\r\nSet-Cookie:\x2
+SF:0testing=1;\x20path=/;\x20secure;\x20httpOnly\r\nX-Frame-Options:\x20SA
+SF:MEORIGIN\r\nContent-Security-Policy:\x20script-src\x20'self'\x20'unsafe
+SF:-inline'\x20'unsafe-eval';\x20frame-src\x20'self';\x20child-src\x20'sel
+SF:f'\r\nX-Content-Type-Options:\x20nosniff\r\nX-no-links:\x201\r\nContent
+SF:-type:\x20text/html;\x20Charset=UTF-8\r\n\r\n<!DOCTYPE\x20HTML>\n<html\
+SF:x20data-bgs=\"gainsboro\"\x20class=\"session_login\">\n<head>\n\x20<met
+SF:a\x20name=\"color-scheme\"\x20content=\"only\x20light\">\n\x20<noscript
+SF:>\x20<style>\x20html\[data-bgs=\"gainsboro\"\]\x20{\x20background-color
+SF::\x20#d6d6d6;\x20}\x20html\[data-bgs=\"nightRider\"\]\x20{\x20backgroun
+SF:d-color:\x20#1a1c20;\x20}\x20html\[data-bgs=\"nightRider\"\]\x20div\[da
+SF:ta-noscript\]\x20{\x20color:\x20#979ba080;\x20}\x20html\[data-slider-fi
+SF:xed='1'\]\x20{\x20margin-right:\x200\x20!important;\x20}\x20body\x20>\x
+SF:20div\[data-noscript\]\x20~\x20\*\x20{\x20display:\x20none\x20!impo")%r
+SF:(HTTPOptions,15BC,"HTTP/1\.0\x20200\x20Document\x20follows\r\nDate:\x20
+SF:Mon,\x2021\x20Apr\x202025\x2012:57:05\x20GMT\r\nServer:\x20MiniServ\r\n
+SF:Connection:\x20close\r\nAuth-type:\x20auth-required=1\r\nSet-Cookie:\x2
+SF:0redirect=1;\x20path=/;\x20secure;\x20httpOnly\r\nSet-Cookie:\x20testin
+SF:g=1;\x20path=/;\x20secure;\x20httpOnly\r\nX-Frame-Options:\x20SAMEORIGI
+SF:N\r\nContent-Security-Policy:\x20script-src\x20'self'\x20'unsafe-inline
+SF:'\x20'unsafe-eval';\x20frame-src\x20'self';\x20child-src\x20'self'\r\nX
+SF:-Content-Type-Options:\x20nosniff\r\nX-no-links:\x201\r\nContent-type:\
+SF:x20text/html;\x20Charset=UTF-8\r\n\r\n<!DOCTYPE\x20HTML>\n<html\x20data
+SF:-bgs=\"gainsboro\"\x20class=\"session_login\">\n<head>\n\x20<meta\x20na
+SF:me=\"color-scheme\"\x20content=\"only\x20light\">\n\x20<noscript>\x20<s
+SF:tyle>\x20html\[data-bgs=\"gainsboro\"\]\x20{\x20background-color:\x20#d
+SF:6d6d6;\x20}\x20html\[data-bgs=\"nightRider\"\]\x20{\x20background-color
+SF::\x20#1a1c20;\x20}\x20html\[data-bgs=\"nightRider\"\]\x20div\[data-nosc
+SF:ript\]\x20{\x20color:\x20#979ba080;\x20}\x20html\[data-slider-fixed='1'
+SF:\]\x20{\x20margin-right:\x200\x20!important;\x20}\x20body\x20>\x20div\[
+SF:data-noscript\]\x20~\x20\*\x20{\x20display:\x20none\x20!impo");
+Aggressive OS guesses: Linux 3.11 - 4.9 (92%), Linux 4.19 - 5.15 (92%), Linux 4.15 (91%), IPFire 2.25 firewall (Linux 4.14) (91%), Linux 4.0 - 4.4 (91%), Linux 3.10 - 3.12 (90%), Linux 3.10 (89%), Linux 4.9 (89%), Linux 3.10 - 4.11 (88%), Linux 3.2 - 3.8 (88%)
+No exact OS matches for host (test conditions non-ideal).
+Network Distance: 17 hops
+Service Info: Host:  vps14.mediweb.co; OSs: Unix, Linux; CPE: cpe:/o:redhat:enterprise_linux:8
 
-TRACEROUTE (using port 143/tcp)
-HOP RTT       ADDRESS
-1   2.00 ms   192.168.1.1
-2   33.00 ms  105.154.104.1
-3   36.00 ms  adsl-210-92-192-81.adsl2.iam.net.ma (81.192.92.210)
-4   36.00 ms  adsl-209-92-192-81.adsl2.iam.net.ma (81.192.92.209)
-5   37.00 ms  static-81-192-32-145.iam.net.ma (81.192.32.145)
-6   ...
-7   76.00 ms  be2780.ccr42.par01.atlas.cogentco.com (154.54.72.225)
-8   82.00 ms  be3685.ccr52.lhr01.atlas.cogentco.com (154.54.60.174)
-9   156.00 ms 154.54.47.145
-10  146.00 ms endurance-international-group.demarc.cogentco.com (38.97.106.34)
-11  145.00 ms 10.254.4.170
-12  158.00 ms ip38-113-20-1.yourhostingaccount.com (38.113.20.1)
-13  159.00 ms 30.149.96.66.static.eigbox.net (66.96.149.30)
+TRACEROUTE (using port 3389/tcp)
+HOP RTT      ADDRESS
+1   5.00 ms  192.168.0.1
+2   6.00 ms  192.168.100.1
+3   7.00 ms  196.65.152.1
+4   15.00 ms adsl-210-92-192-81.adsl2.iam.net.ma (81.192.92.210)
+5   9.00 ms  adsl-205-92-192-81.adsl2.iam.net.ma (81.192.92.205)
+6   9.00 ms  static-81-192-32-141.iam.net.ma (81.192.32.141)
+7   54.00 ms 193.251.248.139
+8   55.00 ms 193.251.150.76
+9   55.00 ms prs-bb2-link.ip.twelve99.net (62.115.123.220)
+10  82.00 ms nug-b2-link.ip.twelve99.net (62.115.112.215)
+11  62.00 ms nug-b2-link.ip.twelve99.net (62.115.112.215)
+12  61.00 ms core12.nbg1.hetzner.com (213.239.245.25)
+13  ...
+14  77.00 ms spine8.cloud1.nbg1.hetzner.com (213.133.114.58)
+15  ... 16
+17  59.00 ms vps14.mediweb.co (162.55.54.135)
 
 OS and Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
-Nmap done: 1 IP address (1 host up) scanned in 82.89 seconds
+Nmap done: 1 IP address (1 host up) scanned in 214.90 seconds

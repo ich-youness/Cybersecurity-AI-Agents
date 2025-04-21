@@ -1,0 +1,15 @@
+[*] std: Performing General Enumeration against: dr-keller-pierre.chirurgiens-dentistes.fr...
+[-] DNSSEC is not configured for dr-keller-pierre.chirurgiens-dentistes.fr
+[*] 	 SOA dns11.ovh.net 213.251.188.130
+[*] 	 SOA dns11.ovh.net 2001:41d0:1:4a82::1
+[*] 	 NS dns11.ovh.net 213.251.188.130
+[*] 	 NS dns11.ovh.net 2001:41d0:1:4a82::1
+[*] 	 NS ns11.ovh.net 213.251.128.130
+[*] 	 NS ns11.ovh.net 2001:41d0:1:1982::1
+[*] 	 MX mx4.mail.ovh.net 178.32.124.207
+[*] 	 MX mx3.mail.ovh.net 91.121.53.175
+[*] 	 A dr-keller-pierre.chirurgiens-dentistes.fr 162.55.54.135
+[*] 	 TXT dr-keller-pierre.chirurgiens-dentistes.fr 1|www.dr-keller-pierre.chirurgiens-dentistes.fr
+[*] 	 TXT dr-keller-pierre.chirurgiens-dentistes.fr v=spf1 a mx include:mx.ovh.com ~all
+[*] Enumerating SRV Records
+[+] 0 Records Found

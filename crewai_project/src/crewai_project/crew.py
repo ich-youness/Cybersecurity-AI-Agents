@@ -12,6 +12,8 @@ from zapv2 import ZAPv2
 import psycopg2
 from pymetasploit3.msfrpc import MsfRpcClient
 import whois
+from jinja2 import Environment, FileSystemLoader
+import pdfkit
 
 agents_config = 'config/agents.yaml'
 tasks_config = 'config/tasks.yaml'
@@ -65,7 +67,66 @@ def send_telegram_document( file_path: str):
             return f"Failed to send document. Error: {response.text}"
     except Exception as e:
         return f"Error sending document: {str(e)}"
-    
+
+
+
+# data = {
+#     "client_name": "ACME Corp",
+#     "report_date": "2025-04-28",
+#     "executive_summary": "This is a high-level summary of findings...",
+#     "nmap_results": "Nmap found 3 open ports: 22, 80, 443...",
+#     "zap_results": "Several XSS vulnerabilities were found...",
+#     "sqlmap_results": "No SQL injection vulnerabilities found.",
+#     "conclusion": "Immediate actions recommended on web server configuration."
+# }
+
+
+
+@tool("generate report")
+def generate_report():
+    """
+    generate a pentest report in PDF format using Jinja2 and pdfkit.
+    """
+
+    with open(r"D:\Stage_PFE\CrewAI\crewai_project\data.json", "r") as dt:
+
+        data = dt.read()
+    template_dir = 'D:/Stage_PFE/CrewAI/crewai_project/src/crewai_project/'
+    template_file = 'pentest_report_template.html'
+
+    env = Environment(loader=FileSystemLoader(template_dir))
+    template = env.get_template(template_file)
+
+    html_out = template.render(data)
+
+    path_wkhtmltopdf = r'C:\Program Files\wkhtmltopdf\bin\wkhtmltopdf.exe'
+    config = pdfkit.configuration(wkhtmltopdf=path_wkhtmltopdf)
+
+    options = {
+        'enable-local-file-access': None
+    }
+
+    pdfkit.from_string(html_out, 'pentest_report.pdf', configuration=config, options=options)
+
+# Exemple de données
+# data = {
+#     "client_name": "ACME Corp",
+#     "report_date": "2025-04-28",
+#     "executive_summary": "Résumé rapide...",
+#     "nmap_results": "Ports ouverts : 22, 80, 443",
+#     "zap_results": "Détection d'injections XSS.",
+#     "sqlmap_results": "Aucune vulnérabilité SQL détectée.",
+#     "conclusion": "Actions recommandées : patcher serveur web."
+# }
+
+
+# generate_report(data, 'pentest_report.pdf')
+
+# @tool("owasp zap scanner")
+# def zap_scanner_tool(path: str):
+#     """
+#     OWASP 
+#     """
 @tool("scrapy tool")
 def scrapy_tool(target_url: str):
     """
@@ -183,12 +244,14 @@ def owasp_zap(target: str):
 
 @tool("Dirbuster scanner")
 def dirbuster_tool(target_url: str, options: str):
+
     """
+
     Run DirBuster in headless mode (no GUI) with custom wordlist and threads.
     
     Args:
         target_url (str): Target URL (e.g., "http://example.com")
-        wordlist_path (str):  r"D:\dirbuster\wordlist.txt"
+        wordlist_path (str):  r"D:/dirbuster/wordlist.txt"
         threads (int): Number of threads 10
     """
     # wordlist_path =r"D:\dirbuster\wordlist.txt"
@@ -245,6 +308,7 @@ def dirbuster_tool(target_url: str, options: str):
         # Save output
         with open("dirbuster_report.txt", "w") as file:
             file.write(result.stdout)
+            print("dirbuster results: /n", result.stdout )
         
         # Save the result to the database
         print("we inserted")
@@ -274,7 +338,7 @@ def sqlmap_tool(target_url: str, options: str):
         target_url (str): The target URL to scan.
         options (str): Additional SQLMap options (e.g., "--batch --level=5").
     """
-    # options = "--crawl=2 "
+    options = "--crawl=2 "
     # opt = options.split()
     options = " ".join(options.split())  # problem to fix: options are not handled correctly!!!
     print("here is the options: ", options)
@@ -670,6 +734,7 @@ def nmap_tool(target: str, options: str):
       capture_output=True,
       text=True  
     )
+    print("Nmap results: ", result.stdout)
     with open("nmap_report.txt","w") as file:
          file.write(result.stdout)
     
@@ -693,14 +758,35 @@ class CrewaiProject():
 
     # agents_config = 'config/agents.yaml'
     # tasks_config = 'config/tasks.yaml'
-
     @agent
-    def researcher(self) -> Agent:
+    def recon_agent(self) -> Agent:
         return Agent(
-            tools=[nmap_tool, owasp_zap, dirbuster_tool, sqlmap_tool, ssl_scanner,metasploit_tool, sublist3r_tool, whois_tool, dnsrecon_tool, scrapy_tool,wafw00f_tool],
-            config=self.agents_config['researcher'],
+            tools=[nmap_tool,  dirbuster_tool, sublist3r_tool, whois_tool, dnsrecon_tool,wafw00f_tool,owasp_zap, sqlmap_tool, ssl_scanner,metasploit_tool , scrapy_tool ],
+            config=self.agents_config['recon_agent'],
             verbose=True
         )
+
+    # @agent
+    # def recon(self)-> Agent:
+    #     return Agent(
+    #         tools=[nmap_tool,  dirbuster_tool, sublist3r_tool, whois_tool, dnsrecon_tool,wafw00f_tool],
+    #         config=self.agents_config['recon'],
+    #         verbose=True
+    #     )
+    # @agent
+    # def vuln(self) -> Agent:
+    #     return Agent(
+    #         tools=[owasp_zap, sqlmap_tool, ssl_scanner,metasploit_tool , scrapy_tool],
+    #         config=self.agents_config['vuln'],
+    #         verbose=True
+    #     )
+    # @agent
+    # def json_format(self) -> Agent:
+    #     return Agent(
+    #         config=self.agents_config['json_format'],
+    #         verbose=True,
+            
+    #     )
     
     @agent
     def telegram_result_sender(self) -> Agent:
@@ -713,7 +799,14 @@ class CrewaiProject():
     @agent
     def reporting_analyst(self) -> Agent:
         return Agent(
+            # tools=[generate_report],
             config=self.agents_config['reporting_analyst'],
+            verbose=True
+        )
+    @agent
+    def html_agent(self) -> Agent:
+        return Agent(
+            config=self.agents_config['html_agent'],
             verbose=True
         )
      
@@ -721,24 +814,49 @@ class CrewaiProject():
 	# To learn more about structured task outputs, 
 	# task dependencies, and task callbacks, check out the documentation:
 	# https://docs.crewai.com/concepts/tasks#overview-of-a-task
+    # @task
+    # def recon_task(self) -> Task:
+    #     return Task(
+    #         config=self.tasks_config['recon_task'],
+    #     )
+    # @task
+    # def vuln_task(self) -> Task:
+    #     return Task(
+    #         config=self.tasks_config['vuln_task'],
+    #     )
     @task
-    def research_task(self) -> Task:
+    def recon_task(self) -> Task:
         return Task(
-            config=self.tasks_config['research_task'],
+            config=self.tasks_config['recon_task'],
+            # output_file='combined_results.txt'
         )
-
+    @task
+    def reporting_task(self) -> Task:
+        return Task(
+            config=self.tasks_config['reporting_task'],
+            output_file='report.txt'
+        )
+    
+    @task
+    def html_task(self) -> Task:
+        return Task(
+            config=self.tasks_config['html_task'],
+            output_file='report_html.html'
+        )
+    
+    # @task
+    # def json_task(self) -> Task:
+    #     return Task(
+    #         config=self.tasks_config['json_task'],
+    #         # output_file='data.json'
+    #     )
     @task
     def telegram_task(self) -> Task:
         return Task(
             config=self.tasks_config['telegram_task'],
         )
     
-    @task
-    def reporting_task(self) -> Task:
-        return Task(
-            config=self.tasks_config['reporting_task'],
-            output_file='report.md'
-        )
+
 
     @crew
     def crew(self) -> Crew:
@@ -751,7 +869,7 @@ class CrewaiProject():
 			tasks=self.tasks, # Automatically created by the @task decorator
 			process=Process.sequential,
 			verbose=True,
-      chat_llm="gemini/gemini-1.5-flash",
+    #   chat_llm="gemini/gemini-1.5-flash",
 			# process=Process.hierarchical, # In case you wanna use that instead https://docs.crewai.com/how-to/Hierarchical/
 		)
 

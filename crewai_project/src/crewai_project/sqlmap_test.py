@@ -68,6 +68,6 @@ def sqlmap_tool(target_url: str, options: str = ""):
     
 # Example usage of sqlmap_tool
 print(sqlmap_tool(
-    target_url="https://movie4u.watch/",
+    target_url="https://2152ad01.ich-youness.pages.dev/",
     options="--crawl=2"
 ))

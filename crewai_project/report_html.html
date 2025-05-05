@@ -1,0 +1,129 @@
+```html
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rapport de Sécurité - 2152ad01.ich-youness.pages.dev</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            line-height: 1.6;
+            margin: 20px;
+        }
+        h1, h2, h3 {
+            color: #333;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        code {
+            background-color: #f0f0f0;
+            padding: 2px 4px;
+            border-radius: 4px;
+        }
+        .vulnerability {
+            background-color: #ffdddd;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ffaaaa;
+        }
+        .recommendation {
+            font-style: italic;
+            color: #007bff;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Rapport de Sécurité - Analyse de 2152ad01.ich-youness.pages.dev</h1>
+
+    <h2>Date: 29 Avril 2025</h2>
+    <h2>Analyste: Reporting Analyst</h2>
+
+    <hr>
+
+    <h2>1. Résumé Exécutif (Executive Summary)</h2>
+
+    <p>Ce rapport présente les résultats d'une analyse de sécurité du site web 2152ad01.ich-youness.pages.dev.  L'analyse a révélé la présence d'un pare-feu d'application web (WAF) Cloudflare.  Malgré ce WAF, des vulnérabilités ont été détectées, notamment la présence de répertoires Git exposés sur les ports 443 et 8443, divulguant des informations sensibles sur le développement du site et révélant un référentiel Git sur Github: <code>https://github.com/ich-youness/Portfolio_website.git</code>.  Des recommandations sont fournies pour atténuer ces vulnérabilités.</p>
+
+    <hr>
+
+    <h2>2. Objectifs & Portée du test</h2>
+
+    <p>L'objectif principal de cette analyse était d'identifier les potentielles vulnérabilités de sécurité du site web 2152ad01.ich-youness.pages.dev. La portée de l'analyse inclut les scans suivants: Sublist3r (recherche de sous-domaines), Whois (information sur le propriétaire du domaine), Nmap (scan de ports et identification des services), wafw00f (détection de WAF) et Dirbuster (exploration de répertoires).</p>
+
+    <hr>
+
+    <h2>3. Méthodologie</h2>
+
+    <p>Les outils suivants ont été utilisés pour mener l'analyse:</p>
+    <ul>
+        <li><strong>Sublist3r:</strong> Recherche de sous-domaines potentiels.</li>
+        <li><strong>Whois:</strong> Recherche d'informations sur le propriétaire du domaine.</li>
+        <li><strong>Nmap:</strong> Scan de ports pour identifier les services en écoute et leurs versions.  Options utilisées: <code>-sV -sC -Pn</code>.</li>
+        <li><strong>wafw00f:</strong> Détection de pare-feu d'application web (WAF).</li>
+        <li><strong>Dirbuster:</strong> Exploration de répertoires pour trouver des fichiers et des dossiers cachés. (Note: Les résultats de Dirbuster ne sont pas fournis dans le contexte.)</li>
+    </ul>
+
+    <hr>
+
+    <h2>4. Détails techniques des vulnérabilités</h2>
+
+    <div class="vulnerability">
+        <h3>Exposition de Répertoires Git</h3>
+        <p>La vulnérabilité principale identifiée est l'exposition de répertoires Git sur les ports 443 et 8443.  L'analyse Nmap a révélé la présence de répertoires <code>.git</code> accessibles, divulguant des informations sur l'historique du développement du site web, y compris le dernier commit message ("first commit") et le lien vers le référentiel GitHub <code>https://github.com/ich-youness/Portfolio_website.git</code>. Cette exposition permet une compréhension approfondie de l'architecture du site et de son code source, présentant un risque important de sécurité.</p>
+        <p class="recommendation"><strong>Recommandation:</strong> Supprimer immédiatement les répertoires <code>.git</code> des ports 443 et 8443 et revoir les paramètres de sécurité du référentiel GitHub pour empêcher l'accès public au code source.</p>
+    </div>
+
+
+    <hr>
+
+    <h2>5. Résultats des scans automatisés</h2>
+
+    <table>
+        <tr>
+            <th>Outil</th>
+            <th>Résultats</th>
+        </tr>
+        <tr>
+            <td>Sublist3r</td>
+            <td>N'a pas trouvé de sous-domaines.</td>
+        </tr>
+        <tr>
+            <td>Whois</td>
+            <td>N'a pas trouvé d'informations. <p class="recommendation"><strong>Recommandation:</strong>  Investiguer plus en profondeur la configuration du domaine.</p></td>
+        </tr>
+        <tr>
+            <td>Nmap</td>
+            <td>A identifié les ports ouverts suivants: 80 (http), 443 (https), 8080 (http), et 8443 (https).  Tous sont liés à un proxy Cloudflare.  Les certificats SSL sur 443 et 8443 sont valides jusqu'au 08 Juin 2025.  Nmap a détecté des répertoires Git exposés.</td>
+        </tr>
+        <tr>
+            <td>wafw00f</td>
+            <td>A confirmé la présence de Cloudflare WAF.</td>
+        </tr>
+        <tr>
+            <td>Dirbuster</td>
+            <td>Résultats non disponibles.</td>
+        </tr>
+    </table>
+
+    <hr>
+
+    <h2>6. Conclusion</h2>
+
+    <p>L'analyse de sécurité de 2152ad01.ich-youness.pages.dev a révélé la présence d'un WAF Cloudflare, mais également l'exposition de répertoires Git, constituant une vulnérabilité majeure. Il est crucial de supprimer immédiatement les répertoires <code>.git</code> des ports 443 et 8443 pour protéger le code source et les informations sensibles du site web.  Il est également recommandé de revoir les paramètres de sécurité du référentiel GitHub afin d'empêcher l'accès public au code source. Des tests plus approfondis et une analyse manuelle pourraient être nécessaires pour identifier d'autres vulnérabilités potentielles.</p>
+
+</body>
+</html>
+```

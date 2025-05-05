@@ -8,7 +8,7 @@
 
                 # Coded By Ahmed Aboul-Ela - @aboul3la
     
-[-] Enumerating subdomains now for dr-keller-pierre.chirurgiens-dentistes.fr
+[-] Enumerating subdomains now for 2152ad01.ich-youness.pages.dev
 [-] Searching now in Baidu..
 [-] Searching now in Yahoo..
 [-] Searching now in Google..
@@ -21,5 +21,3 @@
 [-] Searching now in SSL Certificates..
 [-] Searching now in PassiveDNS..
 [!] Error: Virustotal probably now is blocking our requests
-[-] Total Unique Subdomains Found: 1
-www.dr-keller-pierre.chirurgiens-dentistes.fr

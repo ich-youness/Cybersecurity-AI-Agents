@@ -1,63 +1,143 @@
+# recon_task:
+#   description: >
+#     here is the request from the user: "{target}"
 
-research_task:
+#     You are a reconnaissance agent with a knack for gathering information. You are known for your ability to find hidden details and provide valuable insights to the researcher.
+#     You are tasked with gathering information about the target and preparing it for the researcher.
+#     and depending on what the user requests you will preform the exact actions requested if the request is specified, and if not you can think about what the user needs exactly to complete his task.
+#   expected_output: >
+#     A detailed report containing information about the target, including any relevant details that may assist the researcher in their task.
+#   agent: recon
+
+# vuln_task:
+#   description: >
+#     here is the request from the user: "{target}"
+
+#     You are a vulnerability scanner with a focus on identifying potential weaknesses in the target's security. You are known for your ability to find vulnerabilities in websites, using either tools nmap or owasp zap or dirbuster tool or sqlmap tool or metasploit tool or ssl scanner depending on what the user chooses.
+#     You are tasked with scanning the target for vulnerabilities using the available tools.
+#     and depending on what the user requests you will preform the exact actions requested if the request is specified, and if not you can think about what the user needs exactly to complete his task.
+
+#     if no actions are specified you can skip the task and move on to the next task.
+#     if the user requests a specific action you will perform it and return the results to the user.
+#   expected_output: >
+#     A detailed report containing the results of the scan, including any vulnerabilities found and recommendations for remediation.
+#   agent: vuln
+
+recon_task:
   description: >
     You are tasked with ACCOMPLISHING THE FOLLOWING SCAN {target}. You are known for your ability to find vulnerabilities in websites, using either tools nmap or owasp zap or dirbuster tool or sqlmap tool or metasploit tool or sublist3r tool or whois tool depending on what the user chooses.
     
   expected_output: >
-    a scan results on the website using the options described {target} 
-  agent: researcher
+    scan results of the tools picked by the user.
+
+  agent: recon_agent
+
+  
+reporting_task:
+  description: >
+    here is the request of the user {target}.
+    based on the scans made, you will give me a fully detailed report on each scan made in the following 7 sections:
+    
+    ""
+    1. Page de couverture
+    2. Résumé Exécutif (Executive Summary)
+    3. Objectifs & Portée du test
+    4. Méthodologie
+    5. Détails techniques des vulnérabilités
+    6. Résultats des scans automatisés 
+    7. Conclusion
+    ""
+
+
+
+  # Review the context you got and expand each topic into a full section for a report.
+  # Build a JSON file that contains the name of the tool used and its output in the following format:
+  # data = 
+  #   'report_date': 'report_date',
+  #   'executive_summary': 'executive_summary',
+  #   'nmap_results': 'nmap_results',
+  #   'zap_results': 'zap_results',
+  #   'sqlmap_results': 'sqlmap_results',
+  #   'conclusion': 'conclusion'
+  
+  # and use the tool `generate_report` to generate a report based on the JSON file.
+  expected_output: >
+    A report generated containing all the 7 sections.
+  agent: reporting_analyst
+
+html_task: 
+  description: >
+    You are tasked with generating a detailed HTML/CSS report based on the scan results (owasp zap scan not included).
+    The report should be visually appealing and informative, presenting complex data in a clear and engaging manner.
+    The report should include the following sections:
+    1. Page de couverture
+    2. Résumé Exécutif (Executive Summary)
+    3. Objectifs & Portée du test
+    4. Méthodologie
+    5. Détails techniques des vulnérabilités
+    6. Résultats des scans automatisés 
+    7. Conclusion
+  expected_output: >
+    A detailed HTML/CSS report containing the results of the scan, including any vulnerabilities found and recommendations for remediation.
+  agent: html_agent
+# json_task:
+#   description: >
+#     you are task with turning the scan results into a json file all collected in a 'data' variable where the first part should be like 'name_of_the_tool'_results and the second part the results of the scan.
+
+#     name_of_the_tool to be changed with the name of the tool of course.
+
+#   expected_output: >
+#     json file contaning data variable where the first part is the tool and the second part the results.
+#   agent: json_format
 
 telegram_task:
   description: >
-    Send the document with the results of the scan requested by the user to the user via Telegram. 
+    
+    Send the document with the results of the scan requested (owasp zap scan not included) by the user to the user via Telegram. 
     The agent must determine which scan(s) the user requested and send only the corresponding file(s):
-    
-    - If the user requested **only an Nmap scan**, send the file located at:
-      `D:\Stage_PFE\CrewAI\crewai_project\nmap_report.txt`.
-    
-    - If the user requested **only an OWASP ZAP scan**, send the file located at:
-      `D:\Stage_PFE\CrewAI\crewai_project\zap_report.html`.
-    - If the user requested **only an dirbuster scan**, send the file located at:
-       D:\Stage_PFE\CrewAI\crewai_project\dirbuster_report.txt
-    - If the user requested **only an sqlmap scan**, send the file located at:
-       D:\Stage_PFE\CrewAI\crewai_project\sqlmap_report.txt
-    - If the user requested **only an ssl scanner**, send the file located at:
-       D:\Stage_PFE\CrewAI\crewai_project\ssl_report.txt       
-    - If the user requested **only an Sublist3r**, send the file located at:
-       D:\Stage_PFE\CrewAI\crewai_project\Sublist3r_report.txt 
-    - If the user requested **only an whois tool**, send the file located at:
-       D:\Stage_PFE\CrewAI\crewai_project\whois_report.txt 
-    - If the user requested **only an dnsrecon tool**, send the file located at:
-       D:\Stage_PFE\CrewAI\crewai_project\dnsrecon_report.txt 
-    - If the user requested **only an scrapy tool**, send the file located at:
-       D:\Stage_PFE\CrewAI\crewai_project\scrapy_report.json 
-    - If the user requested **only an wafw00f tool**, send the file located at:
-       D:\Stage_PFE\CrewAI\crewai_project\wafw00f_report.txt 
-    
-    - If the user requested OTHER COMBINATIONS, send THE files RELEVANT TO WHAT THE USER REQUESTED:
-      `D:\Stage_PFE\CrewAI\crewai_project\nmap_report.txt` and
-      `D:\Stage_PFE\CrewAI\crewai_project\zap_report.html`and
-      'D:\Stage_PFE\CrewAI\crewai_project\dirbuster_report.txt' and
-      'D:\Stage_PFE\CrewAI\crewai_project\sqlmap_report.txt' 
-      'D:\Stage_PFE\CrewAI\crewai_project\ssl_report.txt'   
-      'D:\Stage_PFE\CrewAI\crewai_project\Sublist3r_report.txt' 
-      'D:\Stage_PFE\CrewAI\crewai_project\whois_report.txt '
-      'D:\Stage_PFE\CrewAI\crewai_project\dnsrecon_report.txt '
-      'D:\Stage_PFE\CrewAI\crewai_project\scrapy_report.json '
-      'D:\Stage_PFE\CrewAI\crewai_project\wafw00f_report.txt'
+    you will send the report.txt file located at:
+      'D:\Stage_PFE\CrewAI\crewai_project\report_html.html.'
 
-    
-    The agent must **not send any files** for scans that were not explicitly requested by the user.
+    and you will also send the zap_report.html file if an OWASP ZAP scan was performed, it's located at:
+      'D:\Stage_PFE\CrewAI\crewai_project\zap_report.html.'
+  # - If the user requested **only an Nmap scan**, send the file located at:
+  #   `D:\Stage_PFE\CrewAI\crewai_project\nmap_report.txt`.
+  
+  # - If the user requested **only an OWASP ZAP scan**, send the file located at:
+  #   `D:\Stage_PFE\CrewAI\crewai_project\zap_report.html`.
+  # - If the user requested **only an dirbuster scan**, send the file located at:
+  #    D:\Stage_PFE\CrewAI\crewai_project\dirbuster_report.txt
+  # - If the user requested **only an sqlmap scan**, send the file located at:
+  #    D:\Stage_PFE\CrewAI\crewai_project\sqlmap_report.txt
+  # - If the user requested **only an ssl scanner**, send the file located at:
+  #    D:\Stage_PFE\CrewAI\crewai_project\ssl_report.txt       
+  # - If the user requested **only an Sublist3r**, send the file located at:
+  #    D:\Stage_PFE\CrewAI\crewai_project\Sublist3r_report.txt 
+  # - If the user requested **only an whois tool**, send the file located at:
+  #    D:\Stage_PFE\CrewAI\crewai_project\whois_report.txt 
+  # - If the user requested **only an dnsrecon tool**, send the file located at:
+  #    D:\Stage_PFE\CrewAI\crewai_project\dnsrecon_report.txt 
+  # - If the user requested **only an scrapy tool**, send the file located at:
+  #    D:\Stage_PFE\CrewAI\crewai_project\scrapy_report.json 
+  # - If the user requested **only an wafw00f tool**, send the file located at:
+  #    D:\Stage_PFE\CrewAI\crewai_project\wafw00f_report.txt 
+  
+  # - If the user requested OTHER COMBINATIONS, send THE files RELEVANT TO WHAT THE USER REQUESTED:
+  #   `D:\Stage_PFE\CrewAI\crewai_project\nmap_report.txt` and
+  #   `D:\Stage_PFE\CrewAI\crewai_project\zap_report.html`and
+  #   'D:\Stage_PFE\CrewAI\crewai_project\dirbuster_report.txt' and
+  #   'D:\Stage_PFE\CrewAI\crewai_project\sqlmap_report.txt' 
+  #   'D:\Stage_PFE\CrewAI\crewai_project\ssl_report.txt'   
+  #   'D:\Stage_PFE\CrewAI\crewai_project\Sublist3r_report.txt' 
+  #   'D:\Stage_PFE\CrewAI\crewai_project\whois_report.txt '
+  #   'D:\Stage_PFE\CrewAI\crewai_project\dnsrecon_report.txt '
+  #   'D:\Stage_PFE\CrewAI\crewai_project\scrapy_report.json '
+  #   'D:\Stage_PFE\CrewAI\crewai_project\wafw00f_report.txt'
+
+  
+  # The agent must **not send any files** for scans that were not explicitly requested by the user.
   expected_output: >
     A message sent to the user via Telegram containing the results of the scan(s) they requested.
     The message should clearly indicate which scan results are being shared.
   agent: telegram_result_sender
 
-reporting_task:
-  description: >
-    Review the context you got and expand each topic into a full section for a report.
-    Make sure the report is detailed and contains any and all relevant information.
-  expected_output: >
-    A fully fledged report with the main topics, each with a full section of information.
-    Formatted as markdown without '```'
-  agent: reporting_analyst

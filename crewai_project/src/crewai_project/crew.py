@@ -754,10 +754,8 @@ def nmap_tool(target: str, options: str):
 class CrewaiProject():
     """CrewaiProject crew"""
 
-
-
     # agents_config = 'config/agents.yaml'
-    # tasks_config = 'config/tasks.yaml'
+    # tasks_config = 'config/tasks.yaml'git 
     @agent
     def recon_agent(self) -> Agent:
         return Agent(

@@ -25,7 +25,7 @@
 
 recon_task:
   description: >
-    You are tasked with ACCOMPLISHING THE FOLLOWING SCAN {target}. You are known for your ability to find vulnerabilities in websites, using either tools nmap or owasp zap or dirbuster tool or sqlmap tool or metasploit tool or sublist3r tool or whois tool depending on what the user chooses.
+    You are tasked with ACCOMPLISHING THE FOLLOWING SCAN {target}. You are known for your ability to find vulnerabilities in websites, using either tools the nmap tool or the owasp zap tool or dirbuster tool or sqlmap tool or ssl scanner tool or metasploit tool or sublist3r tool or whois tool or dnsrecon tool or scrapy tool or wafw00f tool depending on what the user chooses.
     
   expected_output: >
     scan results of the tools picked by the user.

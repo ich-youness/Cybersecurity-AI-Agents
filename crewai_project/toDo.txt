@@ -1,7 +1,0 @@
-to do tomorrow:
-
-_ work on integrating the database and building the tables first.
-_ once you're done send the mails to both to lfar and imad.
-_ then work on complementary things, web interface, gestion de communication entre agent/utilisateur
-
-+ fiverr do the research on ninjatrader.

@@ -18,6 +18,66 @@ import pdfkit
 agents_config = 'config/agents.yaml'
 tasks_config = 'config/tasks.yaml'
 
+
+def insert_scan_result(target, scan_type, result, **kwargs):
+    """
+    Insère un nouveau résultat de scan dans la base.
+    kwargs permet d'ajouter des paramètres optionnels (ex: options spécifiques à l'outil).
+    """
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    columns = ["target", "scan_type", "result"]
+    values = [target, scan_type, result]
+    for key, value in kwargs.items():
+        columns.append(key)
+        values.append(value)
+    placeholders = ", ".join(["%s"] * len(values))
+    sql = f"INSERT INTO scan_results ({', '.join(columns)}) VALUES ({placeholders})"
+    cursor.execute(sql, values)
+    conn.commit()
+    conn.close()
+
+def get_existing_result(target, scan_type, **kwargs):
+    """
+    Vérifie si un résultat existe déjà pour une cible + type de scan donné (+ options).
+    Retourne le résultat si trouvé, sinon None.
+    """
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    sql = "SELECT result FROM scan_results WHERE target = %s AND scan_type = %s"
+    params = [target, scan_type]
+    for key, value in kwargs.items():
+        sql += f" AND {key} = %s"
+        params.append(value)
+    cursor.execute(sql, params)
+    result = cursor.fetchone()
+    conn.close()
+    return result[0] if result else None
+
+def get_all_scans_for_target(target):
+    """
+    Récupère tous les scans associés à un domaine/cible spécifique.
+    """
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute("SELECT scan_type, result, created_at FROM scan_results WHERE target = %s", (target,))
+    results = cursor.fetchall()
+    conn.close()
+    return results
+
+def delete_old_results(days=30):
+    """
+    Supprime les résultats de scan plus anciens que 'days' jours (par défaut 30).
+    """
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute("DELETE FROM scan_results WHERE created_at < NOW() - INTERVAL '%s days'", (days,))
+    conn.commit()
+    conn.close()
+
+
+
+
 DB_CONFIG = {
     "dbname": "recon_data",
     "user": "postgres",
@@ -70,18 +130,6 @@ def send_telegram_document( file_path: str):
 
 
 
-# data = {
-#     "client_name": "ACME Corp",
-#     "report_date": "2025-04-28",
-#     "executive_summary": "This is a high-level summary of findings...",
-#     "nmap_results": "Nmap found 3 open ports: 22, 80, 443...",
-#     "zap_results": "Several XSS vulnerabilities were found...",
-#     "sqlmap_results": "No SQL injection vulnerabilities found.",
-#     "conclusion": "Immediate actions recommended on web server configuration."
-# }
-
-
-
 @tool("generate report")
 def generate_report():
     """
@@ -108,20 +156,121 @@ def generate_report():
 
     pdfkit.from_string(html_out, 'pentest_report.pdf', configuration=config, options=options)
 
-# Exemple de données
-# data = {
-#     "client_name": "ACME Corp",
-#     "report_date": "2025-04-28",
-#     "executive_summary": "Résumé rapide...",
-#     "nmap_results": "Ports ouverts : 22, 80, 443",
-#     "zap_results": "Détection d'injections XSS.",
-#     "sqlmap_results": "Aucune vulnérabilité SQL détectée.",
-#     "conclusion": "Actions recommandées : patcher serveur web."
-# }
+
+@tool("metasploit exploitation tool")
+def metasploit_tool(target_ip: str, exploit: str, payload: str, options: dict):
+    """
+    Metasploit exploitation tool to exploit a target using a specified exploit and payload.
+
+    Args:
+        target_ip (str): The target IP address.
+        exploit (str): The Metasploit exploit module to use (e.g., "exploit/windows/smb/ms17_010_eternalblue").
+        payload (str): The Metasploit payload to use (e.g., "windows/meterpreter/reverse_tcp").
+        options (dict): Additional options for the exploit (e.g., LHOST, LPORT).
+
+    Returns:
+        str: The result of the exploitation attempt.
+    """
+    try:
+        # Connect to Metasploit RPC server
+        client = MsfRpcClient(password='msfpassword', username='yns', port=55559, server='127.0.0.1', ssl=False)
 
 
+        # Use the specified exploit
+        exploit_module = client.modules.use('exploit', exploit)
+        exploit_module['RHOSTS'] = target_ip
+
+        # Set the payload
+        payload_module = client.modules.use('payload', payload)
+        for key, value in options.items():
+            payload_module[key] = value
+
+        # Execute the exploit
+        print(f"Running exploit {exploit} against {target_ip}...")
+        job_id = exploit_module.execute(payload=payload_module)
+
+        # Wait for the exploit to complete
+        while client.jobs.list:
+            print("Exploit running...")
+            time.sleep(5)
+
+        # Check for sessions
+        if client.sessions.list:
+            session_id = list(client.sessions.list.keys())[0]
+            session = client.sessions.session(session_id)
+            return f"Exploit successful! Session ID: {session_id}\nSession Info: {session.info}"
+            return f"Exploit successful! Session ID: {session_id}"
+
+        else:
+            return "Exploit failed. No session created."
+
+    except Exception as e:
+        return f"Error running Metasploit tool: {str(e)}"
+  
 # generate_report(data, 'pentest_report.pdf')
+@tool("gobuster scanner")
+def gobuster_tool(target_url: str, wordlist_path: str, options: str = ""):
+    """
+    Gobuster scanner tool to enumerate directories or subdomains.
 
+    Args:
+        target_url (str): The target URL or domain to scan.
+        wordlist_path (str): Path to the wordlist file.
+        options (str): Additional Gobuster options (e.g., "-t 10").
+    """
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    # Check if the result already exists in the database
+    cursor.execute("SELECT result FROM scan_results WHERE target = %s AND scan_type = %s AND gobuster_parameters = %s", 
+                   (target_url, "gobuster", options))
+    existing_result = cursor.fetchone()
+
+    if existing_result:
+        print("Here is the result from the DB: ", existing_result)
+        conn.close()
+        with open("gobuster_report.txt", "w") as file:
+            file.write(existing_result[0])
+        return f"Cached result: {existing_result[0]}"
+
+    try:
+        # Construct the Gobuster command
+        command = [
+            "gobuster", "dir",
+            "-u", target_url,
+            "-w", wordlist_path
+        ] + options.split()
+
+        # Run the command
+        result = subprocess.run(
+            command,
+            capture_output=True,
+            text=True,
+            check=True
+        )
+
+        # Save output to a file
+        with open("gobuster_report.txt", "w") as file:
+            file.write(result.stdout)
+
+        # Save the result to the database
+        print("Inserting result into the database...")
+        cursor.execute(
+            "INSERT INTO scan_results (target, scan_type, result, gobuster_parameters) VALUES (%s, %s, %s, %s)",
+            (target_url, "gobuster", result.stdout, options)
+        )
+        conn.commit()
+        conn.close()
+
+        return "Gobuster scan completed. Results saved to gobuster_report.txt"
+
+    except subprocess.CalledProcessError as e:
+        return f"Gobuster failed (exit code {e.returncode}): {e.stderr}"
+    except FileNotFoundError:
+        return "Error: Gobuster not found. Ensure it is installed and in your PATH."
+    except Exception as e:
+        return f"Unexpected error: {str(e)}"
+    
 # @tool("owasp zap scanner")
 # def zap_scanner_tool(path: str):
 #     """
@@ -241,6 +390,7 @@ def owasp_zap(target: str):
     conn.close()
     # Return the path to the report or a summary of the scan
     return f"Scan completed. Report saved to {report_path} "
+
 
 @tool("Dirbuster scanner")
 def dirbuster_tool(target_url: str, options: str):
@@ -442,7 +592,6 @@ def ssl_scanner(target_url: str):
         return f"Unexpected error: {str(e)}"
     
 @tool("sublist3r subdomain enumeration")
-#capable of bruteforcing as well with -b, try adding it later!
 def sublist3r_tool(target_domain: str):
     """
     Sublist3r tool for subdomain enumeration.
@@ -611,56 +760,6 @@ def dnsrecon_tool(target_domain: str, options: str = ""):
         return f"Unexpected error: {str(e)}"
     
 
-@tool("metasploit exploitation tool")
-def metasploit_tool(target_ip: str, exploit: str, payload: str, options: dict):
-    """
-    Metasploit exploitation tool to exploit a target using a specified exploit and payload.
-
-    Args:
-        target_ip (str): The target IP address.
-        exploit (str): The Metasploit exploit module to use (e.g., "exploit/windows/smb/ms17_010_eternalblue").
-        payload (str): The Metasploit payload to use (e.g., "windows/meterpreter/reverse_tcp").
-        options (dict): Additional options for the exploit (e.g., LHOST, LPORT).
-
-    Returns:
-        str: The result of the exploitation attempt.
-    """
-    try:
-        # Connect to Metasploit RPC server
-        client = MsfRpcClient(password='msfpassword', username='yns', port=55559, server='127.0.0.1', ssl=False)
-
-
-        # Use the specified exploit
-        exploit_module = client.modules.use('exploit', exploit)
-        exploit_module['RHOSTS'] = target_ip
-
-        # Set the payload
-        payload_module = client.modules.use('payload', payload)
-        for key, value in options.items():
-            payload_module[key] = value
-
-        # Execute the exploit
-        print(f"Running exploit {exploit} against {target_ip}...")
-        job_id = exploit_module.execute(payload=payload_module)
-
-        # Wait for the exploit to complete
-        while client.jobs.list:
-            print("Exploit running...")
-            time.sleep(5)
-
-        # Check for sessions
-        if client.sessions.list:
-            session_id = list(client.sessions.list.keys())[0]
-            session = client.sessions.session(session_id)
-            return f"Exploit successful! Session ID: {session_id}\nSession Info: {session.info}"
-            return f"Exploit successful! Session ID: {session_id}"
-
-        else:
-            return "Exploit failed. No session created."
-
-    except Exception as e:
-        return f"Error running Metasploit tool: {str(e)}"
-  
 @tool("wafw00f tool")
 def wafw00f_tool(target:str):
     """
@@ -750,19 +849,23 @@ def nmap_tool(target: str, options: str):
   except Exception as e:
     conn.close()
     return f"=> Error handling the Nmap command {str(e)}"
+
+
 @CrewBase
 class CrewaiProject():
     """CrewaiProject crew"""
 
-    # agents_config = 'config/agents.yaml'
-    # tasks_config = 'config/tasks.yaml'git 
+
+
     @agent
     def recon_agent(self) -> Agent:
         return Agent(
-            tools=[nmap_tool,  dirbuster_tool, sublist3r_tool, whois_tool, dnsrecon_tool,wafw00f_tool,owasp_zap, sqlmap_tool, ssl_scanner,metasploit_tool , scrapy_tool ],
+            tools=[nmap_tool,  dirbuster_tool, sublist3r_tool, whois_tool, dnsrecon_tool,wafw00f_tool,owasp_zap, sqlmap_tool, ssl_scanner, scrapy_tool ],
             config=self.agents_config['recon_agent'],
             verbose=True
         )
+
+
 
     # @agent
     # def recon(self)-> Agent:
@@ -801,6 +904,8 @@ class CrewaiProject():
             config=self.agents_config['reporting_analyst'],
             verbose=True
         )
+    
+
     @agent
     def html_agent(self) -> Agent:
         return Agent(
@@ -808,20 +913,6 @@ class CrewaiProject():
             verbose=True
         )
      
-
-	# To learn more about structured task outputs, 
-	# task dependencies, and task callbacks, check out the documentation:
-	# https://docs.crewai.com/concepts/tasks#overview-of-a-task
-    # @task
-    # def recon_task(self) -> Task:
-    #     return Task(
-    #         config=self.tasks_config['recon_task'],
-    #     )
-    # @task
-    # def vuln_task(self) -> Task:
-    #     return Task(
-    #         config=self.tasks_config['vuln_task'],
-    #     )
     @task
     def recon_task(self) -> Task:
         return Task(
@@ -842,12 +933,7 @@ class CrewaiProject():
             output_file='report_html.html'
         )
     
-    # @task
-    # def json_task(self) -> Task:
-    #     return Task(
-    #         config=self.tasks_config['json_task'],
-    #         # output_file='data.json'
-    #     )
+
     @task
     def telegram_task(self) -> Task:
         return Task(
@@ -859,8 +945,7 @@ class CrewaiProject():
     @crew
     def crew(self) -> Crew:
         """Creates the CrewaiProject crew"""
-		# To learn how to add knowledge sources to your crew, check out the documentation:
-		# https://docs.crewai.com/concepts/knowledge#what-is-knowledge
+	
     
         return Crew(
 			agents=self.agents, # Automatically created by the @agent decorator

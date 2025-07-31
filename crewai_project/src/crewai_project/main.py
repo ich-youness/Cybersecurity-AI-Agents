@@ -7,6 +7,7 @@ import json
 import requests
 from crewai_project.crew import CrewaiProject
 
+
 warnings.filterwarnings("ignore", category=SyntaxWarning, module="pysbd")
 
 TOKEN = "8094075847:AAFUuaPGiLveaJwqSEuHTRYGriW_AIUhMDs"
@@ -25,7 +26,7 @@ def get_updates(offset=None):
 def send_message(chat_id, text):
     url = f'{BASE_URL}/sendMessage'
     data = {'chat_id': chat_id, 'text': text}
-    # print("data from message send:  ",data)
+    # print("\ndata from message send:  ",data)
     response = requests.post(url, data=data)
     return response.json()
 
@@ -36,7 +37,7 @@ def send_document(chat_id, file_path, caption=None):
     url = f'{BASE_URL}/sendDocument'
     with open(file_path, 'rb') as file:
         data = {'chat_id': chat_id, 'caption': caption} if caption else {'chat_id': chat_id}
-        # print("data from docum: ", data)
+        # print("\ndata from docum: ", data)
         files = {'document': file}
         response = requests.post(url, data=data, files=files)
     return response.json()
@@ -96,6 +97,48 @@ def main_telegram():
                     return target
             offset = updates[-1]['update_id'] + 1  # Update offset after processing
         time.sleep(1)
+
+import re
+
+def prompt_engineering(message):
+    """
+    Nettoie, extrait les entités clés et gère les erreurs dans le message utilisateur.
+    Retourne un dictionnaire avec les éléments extraits ou un message d'erreur.
+    """
+    # Nettoyage et prétraitement
+    cleaned = re.sub(r'[^\w\s\.\-]', '', message)  # Supprime caractères spéciaux inutiles
+    cleaned = cleaned.strip().lower()
+
+    # Extraction des entités clés (exemple simple)
+    domain_pattern = r'((?:[a-zA-Z0-9\-]+\.)+[a-zA-Z]{2,}|(?:\d{1,3}\.){3}\d{1,3})'
+    scan_types = {
+        "nmap": ["nmap", "ports", "port scan", "scan de ports"],
+        "owasp_zap": ["zap", "vulnérabilité web", "web scan", "owasp"],
+        "gobuster": ["gobuster", "répertoire", "directory", "dirb"],
+        "sqlmap": ["sqlmap", "sql", "injection"],
+        # Ajoute d'autres types si besoin
+    }
+
+    domain_match = re.search(domain_pattern, cleaned)
+    scan_type = None
+    for key, keywords in scan_types.items():
+        if any(word in cleaned for word in keywords):
+            scan_type = key
+            break
+
+    # Gestion des erreurs et prompts ambigus
+    if not domain_match and not scan_type:
+        return {"error": "Veuillez préciser le domaine/IP et le type de scan souhaité."}
+    if not domain_match:
+        return {"error": "Veuillez préciser le domaine ou l'adresse IP à analyser."}
+    if not scan_type:
+        return {"error": "Veuillez préciser le type de scan souhaité (ex: nmap, zap, gobuster, sqlmap)."}
+
+    return {
+        "target": domain_match.group(0),
+        "scan_type": scan_type
+    }
+
 
 def run():
     """
